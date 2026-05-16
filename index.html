@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Orochi Network — Full Contract Discovery & Claim</title>
+<title>Orochi Network — Contract Discovery & Claim</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -57,7 +57,7 @@ body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--fg)
 .mb{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:28px;max-width:400px;width:90%;animation:slideUp .3s ease;}
 @keyframes slideUp{from{transform:translateY(30px);opacity:0;}to{transform:translateY(0);opacity:1;}}
 .tbl{width:100%;border-collapse:collapse;font-size:12px;}
-.tbl th{text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);color:var(--muted);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;}
+.tbl th{text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;}
 .tbl td{padding:8px 10px;border-bottom:1px solid rgba(26,30,53,.5);vertical-align:top;}
 .tbl tr:hover td{background:rgba(0,232,157,.02);}
 .sb{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;font-weight:700;font-size:10px;flex-shrink:0;}
@@ -65,6 +65,11 @@ body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--fg)
 .sb-a{background:rgba(0,201,255,.1);color:var(--accent2);border:1.5px solid rgba(0,201,255,.4);animation:pulse 2s ease-in-out infinite;}
 .sb-p{background:var(--bg2);color:var(--muted);border:1.5px solid var(--border);}
 .timer-ok{color:var(--accent);}.timer-w{color:var(--warning);}.timer-d{color:var(--danger);animation:pulse .8s ease-in-out infinite;}
+.chain-line{position:relative;padding-left:36px;margin-left:16px;border-left:2px solid var(--border);}
+.chain-dot{position:absolute;left:-7px;top:4px;width:12px;height:12px;border-radius:50%;border:2px solid var(--border);background:var(--bg2);}
+.chain-dot.found{border-color:var(--accent);background:var(--accent);}
+.chain-dot.searching{border-color:var(--accent2);background:rgba(0,201,255,.3);box-shadow:0 0 8px rgba(0,201,255,.4);}
+.chain-dot.missing{border-color:var(--danger);background:rgba(255,77,106,.3);}
 </style>
 </head>
 <body>
@@ -88,45 +93,53 @@ body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--fg)
 
 <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8">
 
-<!-- DISCOVERY -->
-<section id="discoverySection" style="margin-bottom:32px;">
+<!-- CONTRACT CHAIN -->
+<section style="margin-bottom:32px;">
   <h1 style="font-size:28px;font-weight:800;line-height:1.1;margin-bottom:6px;">Contract Discovery</h1>
-  <p style="color:var(--muted);font-size:14px;margin-bottom:20px;">Auto-discover all Orochi Network contracts from on-chain data. Reads Airdrop → VestingMain → VestingSub contracts.</p>
+  <p style="color:var(--muted);font-size:14px;margin-bottom:20px;">Starting from the Token contract, discover the entire Orochi Network contract tree on-chain.</p>
 
   <div class="g p-5 mb-5">
-    <div style="font-size:13px;font-weight:700;margin-bottom:10px;"><i class="fa-solid fa-magnifying-glass" style="color:var(--accent);margin-right:6px;"></i>Known Starting Point</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-      <div><div style="font-size:11px;color:var(--muted);margin-bottom:3px;">Token Contract</div><div class="alink" style="font-size:11px;" onclick="ct('0x33f6BE84becfF45ea6aA2952d7eF890B44bFB59d')">0x33f6BE84becfF45ea6aA2952d7eF890B44bFB59d</div></div>
-      <div><div style="font-size:11px;color:var(--muted);margin-bottom:3px;">Airdrop Contract (from Etherscan)</div><div class="alink" style="font-size:11px;" onclick="ct('0x0E4EB875eBa6E4B0e4A36C2A7e4f810d16f8b2767')">0x0E4EB875eBa6E4B0e4A36C2A7e4f810d16f8b2767</div></div>
+    <div style="font-size:13px;font-weight:700;margin-bottom:10px;"><i class="fa-solid fa-satellite-dish" style="color:var(--accent);margin-right:6px;"></i>Starting Point</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:3px;">ONToken Contract</div>
+    <div class="alink" style="font-size:12px;margin-bottom:12px;" onclick="cp('0x33f6BE84becfF45ea6aA2952d7eF890B44bFB59d')">0x33f6BE84becfF45ea6aA2952d7eF890B44bFB59d</div>
+    <div style="margin-bottom:14px;">
+      <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">Airdrop Contract (if known — optional)</label>
+      <input class="inp" id="airdropInput" placeholder="0x... leave blank to auto-discover from VestingMain"/>
     </div>
-    <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
       <button class="btn-big" id="discBtn" onclick="runDiscovery()" disabled><i class="fa-solid fa-satellite-dish" style="margin-right:6px;"></i>Discover All Contracts</button>
-      <button class="btn-s" onclick="owm()">Connect Wallet First</button>
+      <button class="btn-s" onclick="owm()">Connect Wallet</button>
     </div>
+  </div>
+
+  <!-- Discovery chain visualization -->
+  <div id="chainVis" style="display:none;margin-bottom:20px;">
+    <div style="font-size:13px;font-weight:700;margin-bottom:12px;">Contract Tree</div>
+    <div id="chainNodes"></div>
   </div>
 
   <div id="discResults" style="display:none;"></div>
 </section>
 
-<!-- VESTING SCHEDULES -->
-<section id="vestingSection" style="display:none;margin-bottom:32px;">
+<!-- YOUR VESTING -->
+<section id="vestSection" style="display:none;margin-bottom:32px;">
   <h2 style="font-size:22px;font-weight:800;margin-bottom:16px;">Your Vesting Schedules</h2>
-  <div id="vestingResults"></div>
+  <div id="vestResults"></div>
 </section>
 
-<!-- CLAIM SECTION -->
+<!-- AIRDROP CLAIM -->
 <section id="claimSection" style="margin-bottom:32px;">
-  <h2 style="font-size:22px;font-weight:800;margin-bottom:6px;">Claim Airdrop</h2>
-  <p style="color:var(--muted);font-size:14px;margin-bottom:16px;">Challenge-response flow: API gives challenge → you sign → API returns operator proof → submit on-chain.</p>
+  <h2 style="font-size:22px;font-weight:800;margin-bottom:6px;">Claim Tokens</h2>
+  <p style="color:var(--muted);font-size:14px;margin-bottom:16px;">Two claim paths: Vesting (direct, no proof) and Airdrop (challenge-response API).</p>
 
-  <div id="claimFlow" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;">
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;">
     <div style="display:flex;align-items:center;gap:4px;"><div class="sb sb-p" id="cb1">1</div><span style="font-size:11px;font-weight:600;" id="ct1">Connect</span></div>
     <i class="fa-solid fa-arrow-right" style="color:var(--border);font-size:9px;align-self:center;"></i>
     <div style="display:flex;align-items:center;gap:4px;"><div class="sb sb-p" id="cb2">2</div><span style="font-size:11px;font-weight:600;" id="ct2">Challenge</span></div>
     <i class="fa-solid fa-arrow-right" style="color:var(--border);font-size:9px;align-self:center;"></i>
     <div style="display:flex;align-items:center;gap:4px;"><div class="sb sb-p" id="cb3">3</div><span style="font-size:11px;font-weight:600;" id="ct3">Sign</span></div>
     <i class="fa-solid fa-arrow-right" style="color:var(--border);font-size:9px;align-self:center;"></i>
-    <div style="display:flex;align-items:center;gap:4px;"><div class="sb sb-p" id="cb4">4</div><span style="font-size:11px;font-weight:600;" id="ct4">Get Proof</span></div>
+    <div style="display:flex;align-items:center;gap:4px;"><div class="sb sb-p" id="cb4">4</div><span style="font-size:11px;font-weight:600;" id="ct4">Proof</span></div>
     <i class="fa-solid fa-arrow-right" style="color:var(--border);font-size:9px;align-self:center;"></i>
     <div style="display:flex;align-items:center;gap:4px;"><div class="sb sb-p" id="cb5">5</div><span style="font-size:11px;font-weight:600;" id="ct5">Claim</span></div>
   </div>
@@ -136,23 +149,20 @@ body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--fg)
   <div id="apiLog" style="display:none;margin-bottom:16px;"></div>
 
   <div style="display:flex;gap:12px;flex-wrap:wrap;">
-    <button class="btn-big" id="claimBtn" onclick="oneClickClaim()" disabled><i class="fa-solid fa-parachute-box" style="margin-right:6px;"></i>One-Click Claim</button>
-    <button class="btn-s" id="vestClaimBtn" onclick="claimVesting()" disabled style="display:none;"><i class="fa-solid fa-unlock" style="margin-right:4px;"></i>Claim Vesting</button>
+    <button class="btn-big" id="claimBtn" onclick="oneClickClaim()" disabled><i class="fa-solid fa-parachute-box" style="margin-right:6px;"></i>One-Click Airdrop Claim</button>
   </div>
 </section>
 
 <!-- API EXPLORER -->
 <section style="margin-bottom:32px;">
   <h2 style="font-size:18px;font-weight:800;margin-bottom:12px;">API Explorer</h2>
-  <p style="color:var(--muted);font-size:13px;margin-bottom:12px;">Test different API endpoints to find the one that accepts the signed challenge.</p>
   <div class="g p-5">
-    <button class="btn-s" onclick="exploreApi()" style="font-size:12px;padding:8px 16px;"><i class="fa-solid fa-flask" style="margin-right:4px;"></i>Explore All API Endpoints</button>
+    <button class="btn-s" onclick="exploreApi()" style="font-size:12px;padding:8px 16px;"><i class="fa-solid fa-flask" style="margin-right:4px;"></i>Test All API Endpoints</button>
     <div id="apiExploreResults" style="display:none;margin-top:12px;"></div>
   </div>
 </section>
 
 </main>
-
 <footer style="border-top:1px solid var(--border);background:var(--bg2);">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4" style="font-size:11px;color:var(--muted);">Orochi Network Contract Discovery & Claim Tool</div>
 </footer>
@@ -160,53 +170,59 @@ body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--fg)
 
 <script>
 // =====================================================================
-// CONFIG
+// CONFIG — Token contract as the entry point
 // =====================================================================
 const TOKEN_ADDR='0x33f6BE84becfF45ea6aA2952d7eF890B44bFB59d';
-const AIRDROP_ADDR='0x0E4EB875eBa6E4B0e4A36C2A7e4f810d16f8b2767';
 const API_BASE='https://tge.orochi.network/api/v1';
 const PROOF_EXPIRY=300;
 
 const TOKEN_ABI=["function name() view returns(string)","function symbol() view returns(string)","function decimals() view returns(uint8)","function totalSupply() view returns(uint256)","function balanceOf(address) view returns(uint256)","function owner() view returns(address)"];
 const AIRDROP_ABI=["function claim(bytes calldata, tuple(uint256 amount, uint256 nonce, uint64 timestamp) calldata) external","function getAirdropDetail(address) view returns(tuple(uint256 nonce, uint256 redeemed, uint256 timestamp))","function isOperator(address) view returns(bool)","function getToken() view returns(address)","function onVestingMain() view returns(address)","function owner() view returns(address)"];
-const VESTING_MAIN_ABI=["function isTGE() view returns(bool)","function getTimeTGE() view returns(uint256)","function getTokenAddress() view returns(address)","function getImplementation() view returns(address)","function getVestingContractTotal() view returns(uint256)","function getVestingContractAddress(uint256) view returns(address)","function getVestingDetailList(uint256,uint256) view returns(tuple(address contractAddress, address beneficiary, uint64 start, uint64 end, uint64 milestoneDuration, uint64 milestoneClaimed, uint256 milestoneReleaseAmount, uint256 unlockedAtTGE, uint256 totalClaimed, uint256 balanceClaimable, uint256 balanceRemain)[])","function owner() view returns(address)","function isTGE() view returns(bool)"];
-const VESTING_SUB_ABI=["function getBeneficiary() view returns(address)","function getClaimableBalance() view returns(uint256)","function getRemainingBalance() view returns(uint256)","function getVestingDetail() view returns(tuple(address contractAddress, address beneficiary, uint64 start, uint64 end, uint64 milestoneDuration, uint64 milestoneClaimed, uint256 milestoneReleaseAmount, uint256 unlockedAtTGE, uint256 totalClaimed, uint256 balanceClaimable, uint256 balanceRemain))","function claim() external"];
+const VESTING_MAIN_ABI=["function isTGE() view returns(bool)","function getTimeTGE() view returns(uint256)","function getTokenAddress() view returns(address)","function getImplementation() view returns(address)","function getVestingContractTotal() view returns(uint256)","function getVestingContractAddress(uint256) view returns(address)","function getVestingDetailList(uint256,uint256) view returns(tuple(address contractAddress, address beneficiary, uint64 start, uint64 end, uint64 milestoneDuration, uint64 milestoneClaimed, uint256 milestoneReleaseAmount, uint256 unlockedAtTGE, uint256 totalClaimed, uint256 balanceClaimable, uint256 balanceRemain)[])","function owner() view returns(address)"];
+const VESTING_SUB_ABI=["function getBeneficiary() view returns(address)","function getClaimableBalance() view returns(uint256)","function getRemainingBalance() view returns(uint256)","function getVestingDetail() view returns(tuple(address contractAddress, address beneficiary, uint64 start, uint64 end, uint64 milestoneDuration, uint64 milestoneClaimed, uint256 milestoneReleaseAmount, uint256 unlockedAtTGE, uint256 totalClaimed, uint256 balanceRemain))","function claim() external"];
 
 // =====================================================================
 // STATE
 // =====================================================================
-let provider,signer,tokenC,airdropC,account=null,dec=18,sym='ON';
+let provider,signer,tokenC,account=null,dec=18,sym='ON';
 let ethersLoaded=false,ethersResolve;
 const ethersReady=new Promise(r=>{ethersResolve=r;});
-let pTimer=null,pTs=null;
+let pTimer=null;
 
-// Discovered contracts
-let discovered={
-  token:TOKEN_ADDR,
-  airdrop:AIRDROP_ADDR,
-  vestingMain:null,
+// Discovered data
+let disc={
+  token:{addr:TOKEN_ADDR,owner:null,name:'',symbol:'',decimals:18,totalSupply:'0',balance:'0'},
+  vestingMain:{addr:null,isTGE:false,tgeTime:null,tokenAddr:null,impl:null,totalSubs:0,owner:null},
+  airdrop:{addr:null,tokenAddr:null,vestingMainAddr:null,owner:null,detail:null},
   vestingSubs:[],
-  tgeStarted:false,
-  tgeTime:null,
-  vestingOwner:null,
-  airdropOwner:null,
-  tokenOwner:null
+  myVestingSubs:[],
+  network:null,blockNum:0,blockTime:0
 };
-
-// Claim state
 let curChallenge=null,curSig=null,curProof=null,curPayload=null;
-let myVestingSubs=[];
 
 // =====================================================================
 // UTILS
 // =====================================================================
 function toast(m,t='inf'){const c=document.getElementById('toasts'),e=document.createElement('div');e.className=`toast ${t}`;e.textContent=m;c.appendChild(e);setTimeout(()=>e.remove(),5200);}
-function ct(t){navigator.clipboard.writeText(t).then(()=>toast('Copied!','ok'));}
+function cp(t){navigator.clipboard.writeText(t).then(()=>toast('Copied!','ok'));}
 function s(a){return a?a.slice(0,6)+'...'+a.slice(-4):'—';}
 function fN(s){const n=parseFloat(s);if(isNaN(n))return s;if(n>=1e9)return(n/1e9).toFixed(2)+'B';if(n>=1e6)return(n/1e6).toFixed(2)+'M';if(n>=1e3)return(n/1e3).toFixed(2)+'K';return n.toLocaleString(undefined,{maximumFractionDigits:4});}
 function nN(id){const m={1:'Ethereum',56:'BSC',137:'Polygon',43114:'Avalanche',42161:'Arbitrum',10:'Optimism',8453:'Base',11155111:'Sepolia'};return m[id]||`Chain ${id}`;}
 function waitForEthers(){return ethersReady;}
-function setClaimStep(cur){for(let i=1;i<=5;i++){const b=document.getElementById(`cb${i}`),t=document.getElementById(`ct${i}`);b.className='sb '+(i<cur?'sb-d':i===cur?'sb-a':'sb-p');if(i<cur)b.innerHTML='<i class="fa-solid fa-check" style="font-size:8px;"></i>';else b.textContent=i;t.style.color=i<cur?'var(--accent)':i===cur?'var(--accent2)':'var(--muted)';}}
+function setCS(cur){for(let i=1;i<=5;i++){const b=document.getElementById(`cb${i}`),t=document.getElementById(`ct${i}`);b.className='sb '+(i<cur?'sb-d':i===cur?'sb-a':'sb-p');if(i<cur)b.innerHTML='<i class="fa-solid fa-check" style="font-size:8px;"></i>';else b.textContent=i;t.style.color=i<cur?'var(--accent)':i===cur?'var(--accent2)':'var(--muted)';}}
+
+function makeCard(type,icon,title,detail,extra){
+  const c=type==='ok'?'dc-ok':type==='e'?'dc-e':type==='w'?'dc-w':'dc-i';
+  const ic=type==='ok'?'var(--accent)':type==='e'?'var(--danger)':type==='w'?'var(--warning)':'var(--accent2)';
+  return`<div class="dc ${c}"><div style="display:flex;gap:10px;align-items:flex-start;"><div class="di"><i class="fa-solid ${icon}"></i></div><div style="flex:1;min-width:0;"><div style="font-weight:700;font-size:14px;color:${ic};">${title}</div><div style="font-size:12px;color:var(--fg);margin-top:2px;word-break:break-all;">${detail}</div>${extra?`<div style="font-size:11px;color:var(--muted);margin-top:4px;">${extra}</div>`:''}</div></div></div>`;
+}
+
+function chainNode(label,addr,status,info){
+  const dotClass=status==='found'?'found':status==='searching'?'searching':status==='missing'?'missing':'';
+  const addrHtml=addr?`<div class="alink" style="font-size:11px;" onclick="cp('${addr}')">${addr}</div>`:'';
+  const infoHtml=info?`<div style="font-size:11px;color:var(--muted);margin-top:2px;">${info}</div>`:'';
+  return`<div class="chain-line"><div class="chain-dot ${dotClass}"></div><div style="padding-bottom:14px;"><div style="font-weight:700;font-size:13px;color:${status==='found'?'var(--accent)':status==='searching'?'var(--accent2)':status==='missing'?'var(--danger)':'var(--muted)'};">${label}</div>${addrHtml}${infoHtml}</div></div>`;
+}
 
 // =====================================================================
 // WALLET
@@ -228,213 +244,265 @@ async function cw(id){
     provider=new ethers.BrowserProvider(w.p,'any');
     const a=await provider.send('eth_requestAccounts',[]);signer=await provider.getSigner();account=a[0];
     tokenC=new ethers.Contract(TOKEN_ADDR,TOKEN_ABI,signer);
-    airdropC=new ethers.Contract(AIRDROP_ADDR,AIRDROP_ABI,signer);
     const bg=document.getElementById('sB');bg.style.cssText='display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:16px;font-size:11px;font-weight:600;background:rgba(0,232,157,.1);color:var(--accent);border:1px solid rgba(0,232,157,.25);';bg.querySelector('span:first-child').style.background='var(--accent)';
     document.getElementById('sT').textContent=s(account);nb.innerHTML=`<i class="fa-solid fa-wallet" style="margin-right:4px;"></i>${s(account)}`;nb.disabled=false;
     document.getElementById('discBtn').disabled=false;document.getElementById('claimBtn').disabled=false;
-    setClaimStep(2);toast(`Connected via ${w.n}`,'ok');
+    setCS(2);toast(`Connected via ${w.n}`,'ok');
     w.p.on('accountsChanged',async(a)=>{if(!a.length){account=null;return;}account=a[0];});
     w.p.on('chainChanged',()=>location.reload());
   }catch(e){console.error(e);toast('Failed: '+(e.reason||e.message||e),'err');nb.innerHTML='Connect';nb.disabled=false;}
 }
 
 // =====================================================================
-// CONTRACT DISCOVERY
+// DISCOVERY
 // =====================================================================
 async function runDiscovery(){
   if(!ethersLoaded||!account){toast('Connect wallet first','err');return;}
   const btn=document.getElementById('discBtn');btn.disabled=true;btn.innerHTML='<span class="spin" style="margin-right:6px;"></span>Discovering...';
-  const el=document.getElementById('discResults');el.style.display='block';
+  const vis=document.getElementById('chainVis');vis.style.display='block';
+  const nodes=document.getElementById('chainNodes');
+  const res=document.getElementById('discResults');res.style.display='block';
   let html='';
 
   try{
-    // 1. Token contract
-    html+=`<div class="dc dc-i"><div style="display:flex;gap:10px;align-items:center;"><div class="di"><i class="fa-solid fa-spinner fa-spin"></i></div><div><div style="font-weight:700;color:var(--accent2);">Reading Token contract...</div></div></div></div>`;
-    el.innerHTML=html;
+    // === LEVEL 1: TOKEN ===
+    nodes.innerHTML=chainNode('ONToken',TOKEN_ADDR,'searching','Reading contract...');
+    res.innerHTML=makeCard('i','fa-spinner fa-spin','Reading Token contract...','');
 
     const[name,symbol,decimals,totalSupply,balance,tOwner]=await Promise.all([
       tokenC.name(),tokenC.symbol(),tokenC.decimals(),tokenC.totalSupply(),
       tokenC.balanceOf(account),tokenC.owner()
     ]);
     dec=Number(decimals);sym=symbol;
-    discovered.tokenOwner=tOwner;
+    disc.token={addr:TOKEN_ADDR,owner:tOwner,name,symbol,decimals:dec,totalSupply:ethers.formatUnits(totalSupply,dec),balance:ethers.formatUnits(balance,dec)};
 
-    html+=card('ok','fa-coins',`Token: ${name} (${symbol})`,
-      `Supply: ${fN(ethers.formatUnits(totalSupply,dec))} ${sym} · Your Balance: ${fN(ethers.formatUnits(balance,dec))} ${sym}`,
-      `Owner: ${s(tOwner)} · Address: ${TOKEN_ADDR}`);
+    nodes.innerHTML=chainNode('ONToken',TOKEN_ADDR,'found',
+      `${name} (${symbol}) · Supply: ${fN(disc.token.totalSupply)} ${symbol} · Your Balance: ${fN(disc.token.balance)} ${symbol}`);
 
-    // 2. Airdrop contract
-    html+=`<div class="dc dc-i"><div style="display:flex;gap:10px;align-items:center;"><div class="di"><i class="fa-solid fa-spinner fa-spin"></i></div><div style="font-weight:700;color:var(--accent2);">Reading Airdrop contract...</div></div></div>`;
-    el.innerHTML=html;
+    html+=makeCard('ok','fa-coins',`Token: ${name} (${symbol})`,
+      `Supply: ${fN(disc.token.totalSupply)} ${symbol} · Your Balance: ${fN(disc.token.balance)} ${symbol}`,
+      `Owner: <span class="alink" onclick="cp('${tOwner}')">${tOwner}</span> (this is likely the VestingMain contract)`);
 
-    const[adToken,adVestingMain,adOwner,adDetail]=await Promise.all([
-      airdropC.getToken().catch(()=>null),
-      airdropC.onVestingMain().catch(()=>null),
-      airdropC.owner().catch(()=>null),
-      airdropC.getAirdropDetail(account).catch(()=>null)
-    ]);
-    discovered.airdropOwner=adOwner;
-    if(adVestingMain)discovered.vestingMain=adVestingMain;
+    // === LEVEL 2: VESTING MAIN (token.owner()) ===
+    const vmAddr=tOwner;
+    nodes.innerHTML+=chainNode('ONVestingMain',vmAddr,'searching','Reading vesting main...');
 
-    let adInfo=`Owner: ${s(adOwner||'?')}`;
-    if(adToken)adInfo+=` · Token: ${s(adToken)}`;
-    if(adDetail)adInfo+=` · Your Nonce: ${adDetail.nonce.toString()} · Redeemed: ${fN(ethers.formatUnits(adDetail.redeemed,dec))} ${sym}`;
-
-    html+=card('ok','fa-parachute-box','Airdrop Contract',adInfo,`VestingMain: ${adVestingMain?s(adVestingMain):'NOT FOUND'} · Address: ${AIRDROP_ADDR}`);
-
-    // 3. Vesting Main contract
-    if(adVestingMain&&ethers.isAddress(adVestingMain)){
-      html+=`<div class="dc dc-i"><div style="display:flex;gap:10px;align-items:center;"><div class="di"><i class="fa-solid fa-spinner fa-spin"></i></div><div style="font-weight:700;color:var(--accent2);">Reading VestingMain contract...</div></div></div>`;
-      el.innerHTML=html;
-
-      const vmC=new ethers.Contract(adVestingMain,VESTING_MAIN_ABI,provider);
+    let vmC;
+    try{
+      vmC=new ethers.Contract(vmAddr,VESTING_MAIN_ABI,provider);
       const[isTGE,tgeTime,vmToken,vmImpl,vmTotal,vmOwner]=await Promise.all([
         vmC.isTGE().catch(()=>null),vmC.getTimeTGE().catch(()=>null),
         vmC.getTokenAddress().catch(()=>null),vmC.getImplementation().catch(()=>null),
         vmC.getVestingContractTotal().catch(()=>null),vmC.owner().catch(()=>null)
       ]);
-
-      discovered.tgeStarted=isTGE===true;
-      discovered.tgeTime=tgeTime;
-      discovered.vestingOwner=vmOwner;
+      disc.vestingMain={addr:vmAddr,isTGE:isTGE===true,tgeTime,tgeTime,tokenAddr:vmToken,impl:vmImpl,totalSubs:vmTotal?Number(vmTotal):0,owner:vmOwner};
 
       const tgeStatus=isTGE===true?'<span style="color:var(--accent);font-weight:700;">STARTED</span>':'<span style="color:var(--danger);font-weight:700;">NOT STARTED</span>';
       const tgeDate=tgeTime&&Number(tgeTime)>0?new Date(Number(tgeTime)*1000).toLocaleString():'—';
 
-      html+=card(isTGE?'ok':'e',isTGE?'fa-check-circle':'fa-clock',`VestingMain — TGE: ${isTGE?'STARTED':'NOT STARTED'}`,
-        `isTGE: ${tgeStatus} · TGE Time: ${tgeDate} · Owner: ${s(vmOwner||'?')}`,
-        `Token: ${s(vmToken||'?')} · Implementation: ${s(vmImpl||'?')} · Total Vesting Contracts: ${vmTotal?vmTotal.toString():'?'}`);
+      nodes.innerHTML+=chainNode('ONVestingMain',vmAddr,'found',
+        `TGE: ${isTGE?'STARTED':'NOT STARTED'} · TGE Time: ${tgeDate} · Total Vesting Contracts: ${disc.vestingMain.totalSubs}`);
 
-      // 4. Read vesting contracts
-      if(vmTotal&&Number(vmTotal)>0){
-        const total=Number(vmTotal);
-        html+=`<div class="dc dc-i"><div style="display:flex;gap:10px;align-items:center;"><div class="di"><i class="fa-solid fa-spinner fa-spin"></i></div><div style="font-weight:700;color:var(--accent2);">Reading ${total} vesting sub-contracts (looking for yours)...</div></div></div>`;
-        el.innerHTML=html;
+      html+=makeCard(isTGE?'ok':'e',isTGE?'fa-check-circle':'fa-clock',
+        `VestingMain — TGE: ${isTGE?'STARTED':'NOT STARTED'}`,
+        `isTGE: ${tgeStatus} · TGE Time: ${tgeDate} · Owner: ${s(vmOwner||'?')} · Token: ${s(vmToken||'?')}`,
+        `Implementation: ${s(vmImpl||'?')} · Total Sub-contracts: ${disc.vestingMain.totalSubs}`);
 
-        // Read in batches
-        const BATCH=20;
-        let subAddrs=[];
-        for(let i=0;i<total;i+=BATCH){
-          const batch=[];
-          for(let j=i;j<Math.min(i+BATCH,total);j++){
-            batch.push(vmC.getVestingContractAddress(j).catch(()=>null));
-          }
-          const results=await Promise.all(batch);
-          subAddrs.push(...results.filter(a=>a&&ethers.isAddress(a)));
+    }catch(e){
+      nodes.innerHTML+=chainNode('ONVestingMain',vmAddr,'missing','Could not read as VestingMain: '+(e.reason||e.message||'').slice(0,100));
+      html+=makeCard('e','fa-times-circle','VestingMain Read Failed',
+        `Address ${s(vmAddr)} doesn't match VestingMain ABI. It may be an EOA or different contract type.`,
+        `Error: ${(e.reason||e.message||'').slice(0,200)}`);
+    }
+
+    // === LEVEL 3: AIRDROP CONTRACT ===
+    const airdropInput=document.getElementById('airdropInput').value.trim();
+    let adAddr=airdropInput&&ethers.isAddress(airdropInput)?airdropInput:null;
+
+    // Try to find airdrop from vestingMain's known patterns or from vesting subs
+    if(!adAddr&&vmC){
+      nodes.innerHTML+=chainNode('ONAirdrop','?','searching','Looking for airdrop contract...');
+      // The airdrop contract's onVestingMain points to vmAddr
+      // We can't enumerate all contracts, but we can check known addresses
+      // Try reading from common patterns or let user input
+      nodes.innerHTML+=chainNode('ONAirdrop','?','missing',
+        'Cannot auto-discover. Enter the airdrop address manually above.');
+      html+=makeCard('w','fa-question-circle','Airdrop Contract: Unknown',
+        'The airdrop contract address cannot be discovered from on-chain data alone. Enter it in the field above.',
+        'Hint: Check Etherscan for the contract that calls your token\'s transfer() with "claim" method.');
+    }
+
+    if(adAddr){
+      nodes.innerHTML+=chainNode('ONAirdrop',adAddr,'searching','Reading airdrop contract...');
+      try{
+        const adC=new ethers.Contract(adAddr,AIRDROP_ABI,provider);
+        const[adToken,adVm,adOwner,adDetail]=await Promise.all([
+          adC.getToken().catch(()=>null),adC.onVestingMain().catch(()=>null),
+          adC.owner().catch(()=>null),adC.getAirdropDetail(account).catch(()=>null)
+        ]);
+        disc.airdrop={addr:adAddr,tokenAddr:adToken,vestingMainAddr:adVm,owner:adOwner,detail:adDetail};
+
+        let adInfo=`Token: ${s(adToken||'?')} · VestingMain: ${s(adVm||'?')} · Owner: ${s(adOwner||'?')}`;
+        if(adDetail)adInfo+=` · Your Nonce: ${adDetail.nonce.toString()} · Redeemed: ${fN(ethers.formatUnits(adDetail.redeemed,dec))} ${sym}`;
+
+        // Verify the airdrop points to our vesting main
+        const vmMatch=adVm&&adVm.toLowerCase()===vmAddr.toLowerCase();
+
+        nodes.innerHTML+=chainNode('ONAirdrop',adAddr,'found',adInfo);
+        html+=makeCard(vmMatch?'ok':'w','fa-parachute-box','Airdrop Contract',adInfo,
+          vmMatch?'VestingMain matches!':'WARNING: onVestingMain() doesn\'t match the token owner!');
+      }catch(e){
+        nodes.innerHTML+=chainNode('ONAirdrop',adAddr,'missing','Read failed: '+(e.reason||e.message||'').slice(0,80));
+        html+=makeCard('e','fa-times-circle','Airdrop Read Failed',(e.reason||e.message||'').slice(0,300),'');
+      }
+    }
+
+    // === LEVEL 4: VESTING SUB-CONTRACTS ===
+    if(vmC&&disc.vestingMain.totalSubs>0){
+      const total=disc.vestingMain.totalSubs;
+      nodes.innerHTML+=chainNode(`VestingSubs (${total})`,'','searching',`Scanning ${total} sub-contracts for your address...`);
+      html+=makeCard('i','fa-spinner fa-spin',`Scanning ${total} Vesting Sub-contracts`,'Looking for your address...','');
+
+      res.innerHTML=html;
+
+      // Read all sub addresses in batches
+      const BATCH=25;
+      let subAddrs=[];
+      for(let i=0;i<total;i+=BATCH){
+        const batch=[];
+        for(let j=i;j<Math.min(i+BATCH,total);j++){
+          batch.push(vmC.getVestingContractAddress(j).catch(()=>null));
         }
-        discovered.vestingSubs=subAddrs;
+        const results=await Promise.all(batch);
+        subAddrs.push(...results.filter(a=>a&&ethers.isAddress(a)));
+      }
+      disc.vestingSubs=subAddrs;
 
-        // Find your vesting contracts
-        myVestingSubs=[];
-        let vestHtml='';
-        for(const addr of subAddrs){
-          try{
-            const subC=new ethers.Contract(addr,VESTING_SUB_ABI,provider);
-            const[beneficiary,detail]=await Promise.all([
-              subC.getBeneficiary().catch(()=>null),
-              subC.getVestingDetail().catch(()=>null)
-            ]);
-            if(beneficiary&&beneficiary.toLowerCase()===account.toLowerCase()){
-              myVestingSubs.push({address:addr,detail});
-            }
-          }catch(e){}
-        }
-
-        if(myVestingSubs.length>0){
-          html+=card('ok','fa-user-check',`Found ${myVestingSubs.length} Vesting Schedule(s) For You`,'','');
-          // Show vesting details
-          for(const vs of myVestingSubs){
-            const d=vs.detail;
-            const claimable=d.balanceClaimable?ethers.formatUnits(d.balanceClaimable,dec):'0';
-            const remain=d.balanceRemain?ethers.formatUnits(d.balanceRemain,dec):'0';
-            const totalC=d.totalClaimed?ethers.formatUnits(d.totalClaimed,dec):'0';
-            const start=d.start?new Date(Number(d.start)*1000).toLocaleString():'—';
-            const end=d.end?new Date(Number(d.end)*1000).toLocaleString():'—';
-            const unlocked=d.unlockedAtTGE?ethers.formatUnits(d.unlockedAtTGE,dec):'0';
-            const milestoneAmt=d.milestoneReleaseAmount?ethers.formatUnits(d.milestoneReleaseAmount,dec):'0';
-
-            html+=`<div class="dc dc-ok">
-              <div style="font-weight:700;font-size:13px;color:var(--accent);margin-bottom:8px;">Vesting: ${s(vs.address)}</div>
-              <table class="tbl">
-                <tr><th>Field</th><th>Value</th></tr>
-                <tr><td style="color:var(--muted);">Start</td><td>${start}</td></tr>
-                <tr><td style="color:var(--muted);">End</td><td>${end}</td></tr>
-                <tr><td style="color:var(--muted);">Unlocked at TGE</td><td style="color:var(--accent);font-weight:600;">${fN(unlocked)} ${sym}</td></tr>
-                <tr><td style="color:var(--muted);">Milestone Duration</td><td>${d.milestoneDuration?Number(d.milestoneDuration)/(86400)+' days':'?'}</td></tr>
-                <tr><td style="color:var(--muted);">Milestones Claimed</td><td>${d.milestoneClaimed?d.milestoneClaimed.toString():'?'}</td></tr>
-                <tr><td style="color:var(--muted);">Per Milestone</td><td>${fN(milestoneAmt)} ${sym}</td></tr>
-                <tr><td style="color:var(--warning);font-weight:600;">Claimable Now</td><td style="color:var(--accent);font-weight:700;">${fN(claimable)} ${sym}</td></tr>
-                <tr><td style="color:var(--muted);">Remaining</td><td>${fN(remain)} ${sym}</td></tr>
-                <tr><td style="color:var(--muted);">Total Claimed</td><td>${fN(totalC)} ${sym}</td></tr>
-              </table>
-              ${Number(claimable)>0?`<button class="btn-big" onclick="claimFromVesting('${vs.address}')" style="margin-top:10px;padding:10px 24px;font-size:13px;"><i class="fa-solid fa-unlock" style="margin-right:4px;"></i>Claim ${fN(claimable)} ${sym}</button>`:'<div style="margin-top:8px;font-size:12px;color:var(--muted);">No claimable amount yet.</div>'}
-            </div>`;
-          }
-          document.getElementById('vestClaimBtn').style.display='inline-flex';
-          document.getElementById('vestClaimBtn').disabled=false;
-        }else{
-          html+=card('w','fa-user-xmark','No Vesting Schedules Found For Your Address',`Your address ${s(account)} was not found in any of the ${subAddrs.length} vesting sub-contracts. Your tokens may be in the direct airdrop path instead.`,  '');
-        }
-
-        // Also try getVestingDetailList
+      // Find your vesting contracts
+      disc.myVestingSubs=[];
+      for(let i=0;i<subAddrs.length;i++){
         try{
-          const list=await vmC.getVestingDetailList(0,Math.min(total,100));
-          // Find entries for current user
+          const subC=new ethers.Contract(subAddrs[i],VESTING_SUB_ABI,provider);
+          const beneficiary=await subC.getBeneficiary().catch(()=>null);
+          if(beneficiary&&beneficiary.toLowerCase()===account.toLowerCase()){
+            const detail=await subC.getVestingDetail().catch(()=>null);
+            disc.myVestingSubs.push({address:subAddrs[i],beneficiary,detail});
+          }
+        }catch(e){}
+        // Update progress
+        if(i%10===0){
+          nodes.lastElementChild.querySelector('div:last-child div:last-child').textContent=`Scanned ${i+1}/${subAddrs.length}...`;
+        }
+      }
+
+      // Also try getVestingDetailList
+      if(disc.myVestingSubs.length===0){
+        try{
+          const list=await vmC.getVestingDetailList(0,Math.min(total,200));
           const myEntries=list.filter(e=>e.beneficiary&&e.beneficiary.toLowerCase()===account.toLowerCase());
-          if(myEntries.length>0&&myVestingSubs.length===0){
-            html+=card('ok','fa-list','Found via getVestingDetailList',`Found ${myEntries.length} entries for you via the detail list.`, myEntries.map(e=>`Claimable: ${fN(ethers.formatUnits(e.balanceClaimable,dec))} ${sym} · Remaining: ${fN(ethers.formatUnits(e.balanceRemain,dec))} ${sym} · Contract: ${s(e.contractAddress)}`).join('<br>'));
+          if(myEntries.length>0){
+            for(const e of myEntries){
+              disc.myVestingSubs.push({address:e.contractAddress,beneficiary:e.beneficiary,detail:e});
+            }
           }
         }catch(e){}
       }
-    }else{
-      html+=card('e','fa-link-slash','VestingMain: Not Found','Could not read onVestingMain() from airdrop contract. The contract may not have this function, or the address is wrong.','');
+
+      nodes.innerHTML+=chainNode(`VestingSubs (${total})`,'','found',
+        `Found ${subAddrs.length} sub-contracts · ${disc.myVestingSubs.length} belong to you`);
+
+      // Remove the "scanning" card and replace with results
+      html=html.replace(/<div class="dc dc-i".*?Scanning.*?<\/div><\/div><\/div>/,'');
+
+      if(disc.myVestingSubs.length>0){
+        html+=makeCard('ok','fa-user-check',`Found ${disc.myVestingSubs.length} Vesting Schedule(s) For You`,'See details below','');
+        document.getElementById('vestSection').style.display='block';
+
+        let vHtml='';
+        for(const vs of disc.myVestingSubs){
+          const d=vs.detail;
+          if(!d)continue;
+          const claimable=d.balanceClaimable?ethers.formatUnits(d.balanceClaimable,dec):'0';
+          const remain=d.balanceRemain?ethers.formatUnits(d.balanceRemain,dec):'0';
+          const totalC=d.totalClaimed?ethers.formatUnits(d.totalClaimed,dec):'0';
+          const start=d.start&&Number(d.start)>0?new Date(Number(d.start)*1000).toLocaleString():'—';
+          const end=d.end&&Number(d.end)>0?new Date(Number(d.end)*1000).toLocaleString():'—';
+          const unlocked=d.unlockedAtTGE?ethers.formatUnits(d.unlockedAtTGE,dec):'0';
+          const msAmt=d.milestoneReleaseAmount?ethers.formatUnits(d.milestoneReleaseAmount,dec):'0';
+          const msDur=d.milestoneDuration?Number(d.milestoneDuration)/86400:'?';
+          const msClaimed=d.milestoneClaimed?d.milestoneClaimed.toString():'0';
+          const canClaim=Number(claimable)>0;
+
+          vHtml+=`<div class="dc dc-ok" style="margin-bottom:14px;">
+            <div style="font-weight:700;font-size:14px;color:var(--accent);margin-bottom:10px;">
+              <i class="fa-solid fa-lock-open" style="margin-right:4px;"></i> Vesting: <span class="alink" onclick="cp('${vs.address}')">${s(vs.address)}</span>
+            </div>
+            <table class="tbl">
+              <tr><th>Field</th><th>Value</th></tr>
+              <tr><td style="color:var(--muted);">Start</td><td>${start}</td></tr>
+              <tr><td style="color:var(--muted);">End</td><td>${end}</td></tr>
+              <tr><td style="color:var(--muted);">Unlocked at TGE</td><td style="color:var(--accent);font-weight:600;">${fN(unlocked)} ${sym}</td></tr>
+              <tr><td style="color:var(--muted);">Milestone Duration</td><td>${msDur} days</td></tr>
+              <tr><td style="color:var(--muted);">Per Milestone</td><td>${fN(msAmt)} ${sym}</td></tr>
+              <tr><td style="color:var(--muted);">Milestones Claimed</td><td>${msClaimed}</td></tr>
+              <tr><td style="color:var(--warning);font-weight:700;">Claimable Now</td><td style="color:var(--accent);font-weight:700;font-size:16px;">${fN(claimable)} ${sym}</td></tr>
+              <tr><td style="color:var(--muted);">Remaining</td><td>${fN(remain)} ${sym}</td></tr>
+              <tr><td style="color:var(--muted);">Total Claimed</td><td>${fN(totalC)} ${sym}</td></tr>
+            </table>
+            ${canClaim?`<button class="btn-big" onclick="claimVesting('${vs.address}')" style="margin-top:12px;padding:12px 28px;font-size:14px;"><i class="fa-solid fa-unlock" style="margin-right:6px;"></i>Claim ${fN(claimable)} ${sym}</button>`:'<div style="margin-top:10px;padding:8px 12px;border-radius:8px;background:var(--bg2);font-size:12px;color:var(--muted);"><i class="fa-solid fa-hourglass" style="margin-right:4px;"></i>No claimable amount yet. Wait for the next milestone.</div>'}
+          </div>`;
+        }
+        document.getElementById('vestResults').innerHTML=vHtml;
+      }else{
+        html+=makeCard('w','fa-user-xmark','No Vesting Schedules Found For Your Address',
+          `Your address ${s(account)} was not found in any of the ${subAddrs.length} vesting sub-contracts. Your tokens may be in the direct airdrop path instead.`,'');
+      }
     }
 
-    // 5. Network info
+    // === NETWORK INFO ===
     const net=await provider.getNetwork();
     const bn=await provider.getBlockNumber();
     const block=await provider.getBlock(bn);
-    html+=card('i','fa-network-wired','Network Info',`${nN(Number(net.chainId))} (Chain ID: ${net.chainId}) · Block #${bn}`,`Block time: ${new Date(Number(block.timestamp)*1000).toLocaleString()} · Your address: ${s(account)}`);
+    disc.network=net;disc.blockNum=bn;disc.blockTime=Number(block.timestamp);
 
-    // Summary
+    html+=makeCard('i','fa-network-wired','Network',
+      `${nN(Number(net.chainId))} (Chain ID: ${net.chainId}) · Block #${bn}`,
+      `Block time: ${new Date(disc.blockTime*1000).toLocaleString()} · Your address: ${s(account)}`);
+
+    // === SUMMARY ===
     const problems=[];
-    if(!discovered.tgeStarted)problems.push('TGE not started — airdrop claims are blocked');
-    if(myVestingSubs.length===0&&(!adDetail||Number(adDetail.redeemed)===0))problems.push('No vesting schedules or airdrop claims found for your address');
-    if(!discovered.vestingMain)problems.push('Could not find VestingMain contract');
+    if(!disc.vestingMain.isTGE)problems.push('<strong>TGE not started</strong> — airdrop claims will revert with TGENotStarted(). Vesting claims may also be blocked.');
+    if(disc.myVestingSubs.length===0)problems.push('No vesting schedules found for your address in the VestingMain contract.');
+    if(!disc.airdrop.addr)problems.push('Airdrop contract address not provided — enter it above to check your airdrop status.');
 
     if(problems.length>0){
-      html+=card('e','fa-triangle-exclamation','Problems Found',problems.map((p,i)=>`<strong style="color:var(--danger);">${i+1}.</strong> ${p}`).join('<br>'),'Fix these issues to be able to claim.');
+      html+=makeCard('e','fa-triangle-exclamation','Issues Found',
+        problems.map((p,i)=>`<div style="margin-bottom:4px;">${i+1}. ${p}</div>`).join(''),
+        'These may prevent you from claiming.');
     }else{
-      html+=card('ok','fa-check-circle','All Checks Passed','You should be able to claim tokens.','Use the One-Click Claim button or claim from vesting schedules above.');
+      html+=makeCard('ok','fa-check-circle','All Systems Go','You have claimable tokens or a valid airdrop status.','Use the claim buttons above.');
     }
 
-    el.innerHTML=html;
-    document.getElementById('vestingSection').style.display='block';
+    res.innerHTML=html;
 
   }catch(e){
     console.error(e);
-    el.innerHTML+=card('e','fa-times-circle','Discovery Error',e.reason||e.message||String(e),'');
+    res.innerHTML+=makeCard('e','fa-times-circle','Discovery Error',(e.reason||e.message||String(e)).slice(0,500),'');
   }finally{
     btn.disabled=false;btn.innerHTML='<i class="fa-solid fa-satellite-dish" style="margin-right:6px;"></i>Discover All Contracts';
   }
 }
 
-function card(type,icon,title,detail,extra){
-  const c=type==='ok'?'dc-ok':type==='e'?'dc-e':type==='w'?'dc-w':'dc-i';
-  const ic=type==='ok'?'var(--accent)':type==='e'?'var(--danger)':type==='w'?'var(--warning)':'var(--accent2)';
-  return`<div class="dc ${c}"><div style="display:flex;gap:10px;align-items:flex-start;"><div class="di"><i class="fa-solid ${icon}"></i></div><div style="flex:1;min-width:0;"><div style="font-weight:700;font-size:14px;color:${ic};">${title}</div><div style="font-size:12px;color:var(--fg);margin-top:2px;">${detail}</div>${extra?`<div style="font-size:11px;color:var(--muted);margin-top:4px;">${extra}</div>`:''}</div></div></div>`;
-}
-
 // =====================================================================
-// VESTING CLAIM (no proof needed)
+// VESTING CLAIM (direct, no proof needed)
 // =====================================================================
-async function claimFromVesting(subAddr){
+async function claimVesting(subAddr){
   if(!signer){toast('Connect wallet','err');return;}
   try{
     const subC=new ethers.Contract(subAddr,VESTING_SUB_ABI,signer);
     toast('Confirm claim in your wallet...','inf');
     const tx=await subC.claim();
-    toast(`TX submitted: ${s(tx.hash)}`,'inf');
+    toast(`TX submitted: ${s(tx.hash)} — waiting for confirmation...`,'inf');
     const r=await tx.wait();
     toast('Vesting claim successful!','ok');
     runDiscovery();
@@ -445,60 +513,43 @@ async function claimFromVesting(subAddr){
   }
 }
 
-async function claimVesting(){
-  if(myVestingSubs.length===0){toast('No vesting schedules found','err');return;}
-  for(const vs of myVestingSubs){
-    const d=vs.detail;
-    if(d.balanceClaimable&&Number(ethers.formatUnits(d.balanceClaimable,dec))>0){
-      await claimFromVesting(vs.address);
-    }
-  }
-}
-
 // =====================================================================
 // AIRDROP CLAIM (challenge-response)
 // =====================================================================
-async function apiGet(url){
-  const r=await fetch(url);if(!r.ok){const t=await r.text();throw new Error(`${r.status}: ${t}`);}return await r.json();
-}
-async function apiPost(url,body){
-  const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-  if(!r.ok){const t=await r.text();throw new Error(`${r.status}: ${t}`);}return await r.json();
-}
+async function apiGet(url){const r=await fetch(url);if(!r.ok){const t=await r.text();throw new Error(`${r.status}: ${t}`);}return await r.json();}
+async function apiPost(url,body){const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});if(!r.ok){const t=await r.text();throw new Error(`${r.status}: ${t}`);}return await r.json();}
 
 async function oneClickClaim(){
   if(!account||!signer){toast('Connect wallet first','err');return;}
+  const adAddr=disc.airdrop.addr||document.getElementById('airdropInput').value.trim();
+  if(!adAddr||!ethers.isAddress(adAddr)){toast('Enter the airdrop contract address first','err');return;}
+
+  const adC=new ethers.Contract(adAddr,AIRDROP_ABI,signer);
   const btn=document.getElementById('claimBtn');btn.disabled=true;
   const st=document.getElementById('claimStatus');st.style.display='block';
-  stopPT();
+  spPT();
 
   try{
-    // Step 2: Get challenge
-    setClaimStep(2);
-    st.innerHTML=statusCard('i','fa-spinner fa-spin','Step 2: Fetching challenge...','');
+    // Step 2
+    setCS(2);st.innerHTML=sc('i','fa-spinner fa-spin','Step 2: Fetching challenge from API...','');
     btn.innerHTML='<span class="spin" style="margin-right:6px;"></span>Fetching...';
-
     const chData=await apiGet(`${API_BASE}/airdropChallenge?address=${account}`);
     const challenge=chData.challenge||chData.message||chData.data;
-    if(!challenge)throw new Error('No challenge in response: '+JSON.stringify(chData).slice(0,200));
+    if(!challenge)throw new Error('No challenge: '+JSON.stringify(chData).slice(0,200));
     curChallenge=challenge;
-    logApi('Step 2: Challenge',chData);
+    lApi('Step 2: Challenge',chData);
 
-    // Step 3: Sign challenge
-    setClaimStep(3);
-    st.innerHTML=statusCard('i','fa-spinner fa-spin','Step 3: Sign the challenge in your wallet...','Check your wallet popup');
+    // Step 3
+    setCS(3);st.innerHTML=sc('i','fa-spinner fa-spin','Step 3: Sign the challenge in your wallet...','Check wallet popup');
     btn.innerHTML='<span class="spin" style="margin-right:6px;"></span>Sign in Wallet...';
-
     curSig=await signer.signMessage(challenge);
-    logApi('Step 3: Signature',{signature:curSig});
+    lApi('Step 3: Signature',{signature:curSig});
 
-    // Step 4: Get proof — try multiple endpoints
-    setClaimStep(4);
-    st.innerHTML=statusCard('i','fa-spinner fa-spin','Step 4: Getting operator proof...','Trying API endpoints');
+    // Step 4 — try many endpoints
+    setCS(4);st.innerHTML=sc('i','fa-spinner fa-spin','Step 4: Getting operator proof...','Trying API endpoints');
     btn.innerHTML='<span class="spin" style="margin-right:6px;"></span>Getting Proof...';
-
-    let proofData=null,usedEndpoint='';
-    const endpoints=[
+    let proofData=null;
+    const eps=[
       {url:`${API_BASE}/airdropClaim`,body:{address:account,challenge,signature:curSig}},
       {url:`${API_BASE}/airdropChallenge`,body:{address:account,challenge,signature:curSig}},
       {url:`${API_BASE}/airdropProof`,body:{address:account,challenge,signature:curSig}},
@@ -507,73 +558,57 @@ async function oneClickClaim(){
       {url:`${API_BASE}/airdropChallenge`,body:{address:account,signature:curSig}},
       {url:`${API_BASE}/airdropClaim`,body:{address:account,message:challenge,signature:curSig}},
       {url:`${API_BASE}/airdropChallenge`,body:{address:account,message:challenge,signature:curSig}},
-      // Try with sig field name
       {url:`${API_BASE}/airdropClaim`,body:{address:account,challenge,sig:curSig}},
       {url:`${API_BASE}/airdropChallenge`,body:{address:account,challenge,sig:curSig}},
     ];
+    for(const ep of eps){try{proofData=await apiPost(ep.url,ep.body);break;}catch(e){continue;}}
+    if(!proofData)throw new Error('All API endpoints failed. CORS may be blocking browser requests. Use tge.orochi.network directly.');
+    lApi('Step 4: Proof',proofData);
 
-    for(const ep of endpoints){
-      try{
-        const data=await apiPost(ep.url,ep.body);
-        proofData=data;usedEndpoint=ep.url;
-        break;
-      }catch(e){continue;}
-    }
-
-    if(!proofData)throw new Error('All API endpoints failed (CORS or wrong format). Try claiming on tge.orochi.network directly.');
-    logApi(`Step 4: Proof (${s(usedEndpoint)})`,proofData);
-
-    // Parse proof
-    const searchObj=proofData.data||proofData;
-    let ecdsaProof,amount,nonce,timestamp;
-    for(const[k,v] of Object.entries(searchObj)){
+    // Parse
+    const srch=proofData.data||proofData;
+    let eProof,amount,nonce,timestamp;
+    for(const[k,v] of Object.entries(srch)){
       const kl=k.toLowerCase();
-      if((kl.includes('proof')||kl.includes('signature')||kl.includes('ecdsa'))&&typeof v==='string'&&v.startsWith('0x')&&v.length>=64&&!ecdsaProof)ecdsaProof=v;
+      if((kl.includes('proof')||kl.includes('signature')||kl.includes('ecdsa'))&&typeof v==='string'&&v.startsWith('0x')&&v.length>=64&&!eProof)eProof=v;
       if(kl.includes('amount')&&v)amount=v.toString();
       if(kl.includes('nonce')&&v)nonce=v.toString();
       if((kl.includes('timestamp')||kl.includes('time'))&&v)timestamp=v.toString();
     }
-    if(typeof proofData==='string'&&proofData.startsWith('0x')&&proofData.length>=64)ecdsaProof=proofData;
-    if(!ecdsaProof)throw new Error('No ECDSA proof in response: '+JSON.stringify(proofData).slice(0,300));
+    if(typeof proofData==='string'&&proofData.startsWith('0x')&&proofData.length>=64)eProof=proofData;
+    if(!eProof)throw new Error('No ECDSA proof in response: '+JSON.stringify(proofData).slice(0,300));
+    curProof=eProof;curPayload={amount,nonce,timestamp};
+    if(timestamp)spTS(timestamp);
 
-    curProof=ecdsaProof;curPayload={amount,nonce,timestamp};
-    if(timestamp)startPT(timestamp);
-
-    // Step 5: Submit claim
-    setClaimStep(5);
-    st.innerHTML=statusCard('i','fa-spinner fa-spin','Step 5: Submitting claim on-chain...','Confirm in wallet');
-    btn.innerHTML='<span class="spin" style="margin-right:6px;"></span>Confirm in Wallet...';
-
-    const tx=await airdropC.claim(ecdsaProof,{amount,nonce,timestamp});
-    st.innerHTML=statusCard('i','fa-spinner fa-spin','Waiting for confirmation...',`TX: ${s(tx.hash)}`);
+    // Step 5
+    setCS(5);st.innerHTML=sc('i','fa-spinner fa-spin','Step 5: Submitting claim on-chain...','Confirm in wallet');
+    btn.innerHTML='<span class="spin" style="margin-right:6px;"></span>Confirm...';
+    const tx=await adC.claim(eProof,{amount,nonce,timestamp});
+    st.innerHTML=sc('i','fa-spinner fa-spin','Waiting for confirmation...',`TX: ${s(tx.hash)}`);
     btn.innerHTML='<span class="spin" style="margin-right:6px;"></span>Confirming...';
-
-    await tx.wait();stopPT();
-    st.innerHTML=statusCard('ok','fa-check-circle','Claim Successful!',`${amount?fN(ethers.formatUnits(amount,dec))+' '+sym:'Tokens'} claimed. TX: <span class="alink" onclick="ct('${tx.hash}')">${s(tx.hash)}</span>`);
-    toast('Claim successful!','ok');setClaimStep(6);
-
+    await tx.wait();spPT();
+    st.innerHTML=sc('ok','fa-check-circle','Claim Successful!',`${amount?fN(ethers.formatUnits(amount,dec))+' '+sym:'Tokens'} claimed. TX: <span class="alink" onclick="cp('${tx.hash}')">${s(tx.hash)}</span>`);
+    toast('Claim successful!','ok');setCS(6);
   }catch(e){
-    console.error(e);stopPT();
+    console.error(e);spPT();
     let m=e.reason||e.message||String(e);
     if(m.includes('execution reverted:'))m=m.split('execution reverted:').pop().trim();
     if(m.includes('user rejected')||m.includes('denied'))m='You rejected the wallet signature.';
-    st.innerHTML=statusCard('e','fa-times-circle','Error',m);
-    toast('Error: '+m,'err');
+    st.innerHTML=sc('e','fa-times-circle','Error',m);toast('Error: '+m,'err');
   }finally{
-    btn.disabled=false;btn.innerHTML='<i class="fa-solid fa-parachute-box" style="margin-right:6px;"></i>One-Click Claim';
+    btn.disabled=false;btn.innerHTML='<i class="fa-solid fa-parachute-box" style="margin-right:6px;"></i>One-Click Airdrop Claim';
   }
 }
 
-function statusCard(type,icon,title,detail){
+function sc(type,icon,title,detail){
   const c=type==='ok'?'dc-ok':type==='e'?'dc-e':'dc-i';
   const ic=type==='ok'?'var(--accent)':type==='e'?'var(--danger)':'var(--accent2)';
   return`<div class="dc ${c}"><div style="display:flex;gap:10px;align-items:center;"><div class="di"><i class="fa-solid ${icon}"></i></div><div><div style="font-weight:700;color:${ic};">${title}</div><div style="font-size:12px;color:var(--fg);">${detail}</div></div></div></div>`;
 }
-
-function logApi(title,data){
-  const el=document.getElementById('apiLog');el.style.display='block';
-  el.innerHTML+=`<div class="dc dc-i"><div style="font-weight:700;font-size:12px;color:var(--accent2);margin-bottom:4px;">${title}</div><div class="cb">${typeof data==='string'?data:JSON.stringify(data,null,2)}</div></div>`;
-}
+function lApi(t,d){const el=document.getElementById('apiLog');el.style.display='block';el.innerHTML+=`<div class="dc dc-i"><div style="font-weight:700;font-size:12px;color:var(--accent2);margin-bottom:4px;">${t}</div><div class="cb">${typeof d==='string'?d:JSON.stringify(d,null,2)}</div></div>`;}
+function spTS(ts){const pTs=Number(ts);if(pTimer)clearInterval(pTimer);const area=document.getElementById('timerArea');area.style.display='block';area.innerHTML=`<div class="dc dc-w"><div style="display:flex;gap:10px;align-items:center;"><div class="di"><i class="fa-solid fa-hourglass-half"></i></div><div><div style="font-weight:700;font-size:13px;color:var(--warning);">Proof Expires In</div><div class="mono" style="font-size:14px;font-weight:700;" id="tD">--:--</div></div></div></div>`;
+function u(){const n=Math.floor(Date.now()/1000),r=pTs+PROOF_EXPIRY-n;if(r<=0){document.getElementById('tD').textContent='EXPIRED';document.getElementById('tD').className='mono timer-d';clearInterval(pTimer);return;}const m=Math.floor(r/60),s=r%60;const d=document.getElementById('tD');d.textContent=`${m}:${s.toString().padStart(2,'0')}`;d.className='mono '+(r>60?'timer-ok':r>30?'timer-w':'timer-d');}u();pTimer=setInterval(u,1000);}
+function spPT(){if(pTimer)clearInterval(pTimer);document.getElementById('timerArea').style.display='none';}
 
 // =====================================================================
 // API EXPLORER
@@ -581,93 +616,27 @@ function logApi(title,data){
 async function exploreApi(){
   if(!account){toast('Connect wallet first','err');return;}
   const el=document.getElementById('apiExploreResults');el.style.display='block';
-  el.innerHTML='<div class="dc dc-i"><div class="di" style="display:inline;"><i class="fa-solid fa-spinner fa-spin"></i></div> <span style="color:var(--accent2);">Testing API endpoints...</span></div>';
-
+  el.innerHTML='<div class="dc dc-i"><div class="di" style="display:inline;"><i class="fa-solid fa-spinner fa-spin"></i></div> <span style="color:var(--accent2);">Testing endpoints...</span></div>';
   let results=[];
-
-  // Test GET endpoints
-  const getEndpoints=[
+  const gets=[
     `${API_BASE}/airdropChallenge?address=${account}`,
     `${API_BASE}/airdropDetail?address=${account}`,
     `${API_BASE}/airdrop?address=${account}`,
     `${API_BASE}/claim?address=${account}`,
     `${API_BASE}/status`,
     `${API_BASE}/health`,
-    `${API_BASE}/`,
   ];
-
-  for(const url of getEndpoints){
-    try{
-      const r=await fetch(url);
-      const ct=r.headers.get('content-type');
-      let body='';
-      if(ct&&ct.includes('json')){const j=await r.json();body=JSON.stringify(j,null,2);}
-      else{body=await r.text();}
-      results.push({url,method:'GET',status:r.status,ok:r.ok,body:body.slice(0,500),cors:r.headers.get('access-control-allow-origin')||'none'});
-    }catch(e){
-      results.push({url,method:'GET',status:'ERR',ok:false,body:e.message,cors:'—'});
-    }
-  }
-
-  // Test OPTIONS for POST endpoints
-  const postEndpoints=[
-    `${API_BASE}/airdropClaim`,
-    `${API_BASE}/airdropChallenge`,
-    `${API_BASE}/airdropProof`,
-    `${API_BASE}/airdropVerify`,
-    `${API_BASE}/claim`,
-  ];
-
-  for(const url of postEndpoints){
-    try{
-      const r=await fetch(url,{method:'OPTIONS'});
-      const allow=r.headers.get('access-control-allow-methods')||'';
-      const allowHeaders=r.headers.get('access-control-allow-headers')||'';
-      const cors=r.headers.get('access-control-allow-origin')||'none';
-      results.push({url,method:'OPTIONS',status:r.status,ok:r.ok,body:`Allow-Methods: ${allow}\nAllow-Headers: ${allowHeaders}`,cors});
-    }catch(e){
-      results.push({url,method:'OPTIONS',status:'ERR',ok:false,body:e.message,cors:'—'});
-    }
-  }
-
-  // Render results
-  let html=`<div style="font-size:13px;font-weight:700;margin-bottom:8px;">Results</div>`;
-  html+=`<table class="tbl"><tr><th>Method</th><th>Endpoint</th><th>Status</th><th>CORS</th><th>Body</th></tr>`;
-  for(const r of results){
-    const sc=r.ok?'var(--accent)':r.status==='ERR'?'var(--danger)':'var(--warning)';
-    const cc=r.cors!=='none'?'var(--accent)':'var(--danger)';
-    html+=`<tr>
-      <td style="font-weight:600;color:var(--accent2);">${r.method}</td>
-      <td class="alink" style="font-size:10px;word-break:break-all;" onclick="ct('${r.url}')">${r.url.replace(API_BASE,'')}</td>
-      <td style="color:${sc};font-weight:600;">${r.status}</td>
-      <td style="color:${cc};font-size:10px;">${r.cors!=='none'?'YES':'NO'}</td>
-      <td style="font-size:10px;max-width:300px;word-break:break-all;"><details><summary style="cursor:pointer;color:var(--muted);">Show</summary><div class="cb" style="margin-top:4px;font-size:9px;max-height:150px;">${r.body}</div></details></td>
-    </tr>`;
-  }
-  html+=`</table>`;
-
-  // Analysis
-  const working=results.filter(r=>r.ok);
-  const corsEnabled=results.filter(r=>r.cors!=='none');
-  html+=`<div class="dc dc-i" style="margin-top:10px;">
-    <div style="font-size:12px;font-weight:700;color:var(--accent2);margin-bottom:6px;">Analysis</div>
-    <div style="font-size:12px;color:var(--fg);">
-      <div>Working endpoints: <strong style="color:var(--accent);">${working.length}</strong> / ${results.length}</div>
-      <div>CORS-enabled endpoints: <strong style="color:var(--accent);">${corsEnabled.length}</strong> / ${results.length}</div>
-      ${corsEnabled.length===0?'<div style="color:var(--danger);margin-top:6px;font-weight:600;">No CORS-enabled endpoints found. Browser-based claiming is not possible. Use the official page at tge.orochi.network</div>':''}
-      ${working.length>0?`<div style="color:var(--accent);margin-top:6px;">Working GET endpoints: ${working.map(r=>r.url.replace(API_BASE,'')).join(', ')}</div>`:''}
-    </div>
-  </div>`;
-
-  el.innerHTML=html;
+  for(const url of gets){try{const r=await fetch(url);const ct=r.headers.get('content-type');let b='';if(ct&&ct.includes('json')){b=JSON.stringify(await r.json(),null,2);}else{b=(await r.text()).slice(0,500);}results.push({url,method:'GET',status:r.status,ok:r.ok,body:b.slice(0,500),cors:r.headers.get('access-control-allow-origin')||'none'});}catch(e){results.push({url,method:'GET',status:'ERR',ok:false,body:e.message,cors:'—'});}}
+  const posts=[`${API_BASE}/airdropClaim`,`${API_BASE}/airdropChallenge`,`${API_BASE}/airdropProof`];
+  for(const url of posts){try{const r=await fetch(url,{method:'OPTIONS'});const am=r.headers.get('access-control-allow-methods')||'';const ah=r.headers.get('access-control-allow-headers')||'';const co=r.headers.get('access-control-allow-origin')||'none';results.push({url,method:'OPTIONS',status:r.status,ok:r.ok,body:`Allow-Methods: ${am}\nAllow-Headers: ${ah}`,cors:co});}catch(e){results.push({url,method:'OPTIONS',status:'ERR',ok:false,body:e.message,cors:'—'});}}
+  let h=`<table class="tbl"><tr><th>Method</th><th>Endpoint</th><th>Status</th><th>CORS</th><th>Body</th></tr>`;
+  for(const r of results){const sc2=r.ok?'var(--accent)':r.status==='ERR'?'var(--danger)':'var(--warning)';const cc=r.cors!=='none'?'var(--accent)':'var(--danger)';
+  h+=`<tr><td style="font-weight:600;color:var(--accent2);">${r.method}</td><td class="alink" style="font-size:10px;" onclick="cp('${r.url}')">${r.url.replace(API_BASE,'')}</td><td style="color:${sc2};font-weight:600;">${r.status}</td><td style="color:${cc};font-size:10px;">${r.cors!=='none'?'YES':'NO'}</td><td style="font-size:10px;max-width:280px;"><details><summary style="cursor:pointer;color:var(--muted);">Show</summary><div class="cb" style="margin-top:4px;font-size:9px;">${r.body}</div></details></td></tr>`;}
+  h+=`</table>`;
+  const corsN=results.filter(r=>r.cors!=='none').length;
+  h+=`<div class="dc dc-i" style="margin-top:10px;"><div style="font-size:12px;">CORS-enabled: <strong style="color:${corsN>0?'var(--accent)':'var(--danger)'};">${corsN}</strong> / ${results.length}${corsN===0?'<div style="color:var(--danger);margin-top:6px;">No CORS endpoints. Browser claiming blocked. Use tge.orochi.network.</div>':''}</div></div>`;
+  el.innerHTML=h;
 }
-
-// =====================================================================
-// TIMER
-// =====================================================================
-function startPT(ts){pTs=Number(ts);if(pTimer)clearInterval(pTimer);const area=document.getElementById('timerArea');area.style.display='block';area.innerHTML=`<div class="dc dc-w"><div style="display:flex;gap:10px;align-items:center;"><div class="di"><i class="fa-solid fa-hourglass-half"></i></div><div><div style="font-weight:700;font-size:13px;color:var(--warning);">Proof Expires In</div><div class="mono" style="font-size:14px;font-weight:700;" id="tD">--:--</div></div></div></div>`;
-function u(){const n=Math.floor(Date.now()/1000),r=pTs+PROOF_EXPIRY-n;if(r<=0){document.getElementById('tD').textContent='EXPIRED';document.getElementById('tD').className='mono timer-d';clearInterval(pTimer);toast('Proof expired!','err');return;}const m=Math.floor(r/60),s=r%60;const d=document.getElementById('tD');d.textContent=`${m}:${s.toString().padStart(2,'0')}`;d.className='mono '+(r>60?'timer-ok':r>30?'timer-w':'timer-d');}u();pTimer=setInterval(u,1000);}
-function stopPT(){if(pTimer)clearInterval(pTimer);document.getElementById('timerArea').style.display='none';}
 
 // =====================================================================
 // ETHERS LOADER
