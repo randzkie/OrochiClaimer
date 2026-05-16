@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Orochi Network — Airdrop Claim</title>
+<title>Orochi Network — Full Contract Discovery & Claim</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -12,7 +12,7 @@
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--fg);min-height:100vh;overflow-x:hidden;}
 .bg-fx{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
-.bg-fx .orb{position:absolute;border-radius:50%;filter:blur(150px);opacity:.08;animation:drift 26s ease-in-out infinite alternate;}
+.bg-fx .orb{position:absolute;border-radius:50%;filter:blur(150px);opacity:.07;animation:drift 26s ease-in-out infinite alternate;}
 .bg-fx .orb:nth-child(1){width:600px;height:600px;background:var(--accent);top:-250px;left:-150px;animation-duration:30s;}
 .bg-fx .orb:nth-child(2){width:450px;height:450px;background:var(--accent2);bottom:-180px;right:-80px;animation-duration:34s;animation-delay:-8s;}
 @keyframes drift{0%{transform:translate(0,0) scale(1);}50%{transform:translate(50px,-30px) scale(1.06);}100%{transform:translate(-20px,20px) scale(.97)};}
@@ -20,7 +20,6 @@ body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--fg)
 .g{background:var(--card);border:1px solid var(--border);border-radius:16px;backdrop-filter:blur(20px);transition:border-color .3s;}
 .inp{background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--fg);font-family:'JetBrains Mono',monospace;font-size:12px;width:100%;transition:all .25s;outline:none;}
 .inp:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,232,157,.08);}
-.inp::placeholder{color:var(--muted);}
 .btn-s{background:transparent;color:var(--accent);font-weight:600;border:1.5px solid rgba(0,232,157,.3);border-radius:10px;padding:10px 20px;cursor:pointer;transition:all .25s;font-family:'Space Grotesk',sans-serif;font-size:14px;}
 .btn-s:hover{background:rgba(0,232,157,.08);}
 .btn-s:disabled{opacity:.3;cursor:not-allowed;}
@@ -36,265 +35,126 @@ body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--fg)
 .toast.inf{background:rgba(0,201,255,.08);color:var(--accent2);border-color:rgba(0,201,255,.25);}
 @keyframes tIn{from{transform:translateX(100px);opacity:0;}to{transform:translateX(0);opacity:1;}}
 @keyframes tOut{from{opacity:1;}to{opacity:0;transform:translateY(-10px);}}
-.spin{width:18px;height:18px;border:2.5px solid transparent;border-top-color:currentColor;border-radius:50%;animation:sp .6s linear infinite;display:inline-block;vertical-align:middle;}
-@keyframes sp{to{transform:rotate(360deg);}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.5;}}
-
-.diag-card{border-radius:12px;padding:14px;border:1px solid;animation:fadeUp .35s ease;margin-bottom:10px;}
-.diag-ok{background:rgba(0,232,157,.06);border-color:rgba(0,232,157,.2);}
-.diag-warn{background:rgba(255,184,77,.06);border-color:rgba(255,184,77,.2);}
-.diag-err{background:rgba(255,77,106,.06);border-color:rgba(255,77,106,.2);}
-.diag-info{background:rgba(0,201,255,.06);border-color:rgba(0,201,255,.2);}
-.diag-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
-.diag-ok .diag-icon{background:rgba(0,232,157,.15);color:var(--accent);}
-.diag-warn .diag-icon{background:rgba(255,184,77,.15);color:var(--warning);}
-.diag-err .diag-icon{background:rgba(255,77,106,.15);color:var(--danger);}
-.diag-info .diag-icon{background:rgba(0,201,255,.15);color:var(--accent2);}
-
-.wallet-opt{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:12px;cursor:pointer;border:1.5px solid var(--border);transition:all .25s;background:var(--card);margin-bottom:10px;}
-.wallet-opt:hover{border-color:var(--accent);background:rgba(0,232,157,.04);transform:translateX(4px);}
-.wallet-opt .wicon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
-.modal-overlay{position:fixed;inset:0;z-index:9990;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;}
-.modal-box{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:28px;max-width:400px;width:90%;animation:slideUp .3s ease;}
+.spin{width:18px;height:18px;border:2.5px solid transparent;border-top-color:currentColor;border-radius:50%;animation:sp .6s linear infinite;display:inline-block;vertical-align:middle;}
+@keyframes sp{to{transform:rotate(360deg);}}
+.dc{border-radius:12px;padding:14px;border:1px solid;animation:fadeUp .35s ease;margin-bottom:10px;}
+.dc-ok{background:rgba(0,232,157,.06);border-color:rgba(0,232,157,.2);}
+.dc-w{background:rgba(255,184,77,.06);border-color:rgba(255,184,77,.2);}
+.dc-e{background:rgba(255,77,106,.06);border-color:rgba(255,77,106,.2);}
+.dc-i{background:rgba(0,201,255,.06);border-color:rgba(0,201,255,.2);}
+.di{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.dc-ok .di{background:rgba(0,232,157,.15);color:var(--accent);}
+.dc-w .di{background:rgba(255,184,77,.15);color:var(--warning);}
+.dc-e .di{background:rgba(255,77,106,.15);color:var(--danger);}
+.dc-i .di{background:rgba(0,201,255,.15);color:var(--accent2);}
+.cb{background:#080910;border:1px solid var(--border);border-radius:8px;padding:12px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent);overflow-x:auto;white-space:pre-wrap;word-break:break-all;line-height:1.5;max-height:200px;overflow-y:auto;}
+.wo{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:12px;cursor:pointer;border:1.5px solid var(--border);transition:all .25s;background:var(--card);margin-bottom:10px;}
+.wo:hover{border-color:var(--accent);background:rgba(0,232,157,.04);transform:translateX(4px);}
+.wo .wi{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.mo{position:fixed;inset:0;z-index:9990;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;}
+.mb{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:28px;max-width:400px;width:90%;animation:slideUp .3s ease;}
 @keyframes slideUp{from{transform:translateY(30px);opacity:0;}to{transform:translateY(0);opacity:1;}}
-
-.code-block{background:#080910;border:1px solid var(--border);border-radius:8px;padding:12px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent);overflow-x:auto;white-space:pre-wrap;word-break:break-all;line-height:1.5;max-height:250px;overflow-y:auto;}
-
-.step-badge{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;font-weight:700;font-size:11px;flex-shrink:0;}
-.step-done{background:rgba(0,232,157,.15);color:var(--accent);border:1.5px solid rgba(0,232,157,.4);}
-.step-active{background:rgba(0,201,255,.1);color:var(--accent2);border:1.5px solid rgba(0,201,255,.4);animation:pulse 2s ease-in-out infinite;}
-.step-pending{background:var(--bg2);color:var(--muted);border:1.5px solid var(--border);}
-
-.timer-text{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;}
-.timer-ok{color:var(--accent);}.timer-warn{color:var(--warning);}.timer-danger{color:var(--danger);animation:pulse .8s ease-in-out infinite;}
+.tbl{width:100%;border-collapse:collapse;font-size:12px;}
+.tbl th{text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);color:var(--muted);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;}
+.tbl td{padding:8px 10px;border-bottom:1px solid rgba(26,30,53,.5);vertical-align:top;}
+.tbl tr:hover td{background:rgba(0,232,157,.02);}
+.sb{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;font-weight:700;font-size:10px;flex-shrink:0;}
+.sb-d{background:rgba(0,232,157,.15);color:var(--accent);border:1.5px solid rgba(0,232,157,.4);}
+.sb-a{background:rgba(0,201,255,.1);color:var(--accent2);border:1.5px solid rgba(0,201,255,.4);animation:pulse 2s ease-in-out infinite;}
+.sb-p{background:var(--bg2);color:var(--muted);border:1.5px solid var(--border);}
+.timer-ok{color:var(--accent);}.timer-w{color:var(--warning);}.timer-d{color:var(--danger);animation:pulse .8s ease-in-out infinite;}
 </style>
 </head>
 <body>
 <div class="bg-fx"><div class="orb"></div><div class="orb"></div></div>
 <div class="toast-box" id="toasts"></div>
-<div id="walletModal" style="display:none;"></div>
+<div id="wm" style="display:none;"></div>
 
 <div class="wrap">
 <header style="position:sticky;top:0;z-index:50;background:rgba(6,7,11,.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);">
-  <div class="max-w-5xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
     <div class="flex items-center gap-3">
       <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#06070b;">ON</div>
-      <div><div class="font-bold" style="line-height:1.1;">Orochi Network</div><div style="font-size:10px;color:var(--muted);letter-spacing:1.5px;">AIRDROP CLAIM TOOL</div></div>
+      <div><div class="font-bold" style="line-height:1.1;">Orochi Network</div><div style="font-size:10px;color:var(--muted);letter-spacing:1.5px;">CONTRACT DISCOVERY & CLAIM</div></div>
     </div>
     <div class="flex items-center gap-3">
-      <div id="sBadge" style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:16px;font-size:11px;font-weight:600;background:rgba(255,77,106,.1);color:var(--danger);border:1px solid rgba(255,77,106,.25);">
-        <span style="width:5px;height:5px;border-radius:50%;background:var(--danger);"></span>
-        <span id="sText">Disconnected</span>
-      </div>
-      <button class="btn-s" id="navConn" onclick="openWalletModal()" style="padding:8px 16px;font-size:13px;"><i class="fa-solid fa-wallet" style="margin-right:4px;"></i>Connect</button>
+      <div id="sB" style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:16px;font-size:11px;font-weight:600;background:rgba(255,77,106,.1);color:var(--danger);border:1px solid rgba(255,77,106,.25);"><span style="width:5px;height:5px;border-radius:50%;background:var(--danger);"></span><span id="sT">Disconnected</span></div>
+      <button class="btn-s" id="nc" onclick="owm()" style="padding:8px 16px;font-size:13px;"><i class="fa-solid fa-wallet" style="margin-right:4px;"></i>Connect</button>
     </div>
   </div>
 </header>
 
-<main class="max-w-5xl mx-auto px-4 sm:px-6 py-8">
+<main class="max-w-6xl mx-auto px-4 sm:px-6 py-8">
 
-  <!-- FLOW EXPLANATION -->
-  <div style="margin-bottom:24px;">
-    <h1 style="font-size:28px;font-weight:800;line-height:1.1;margin-bottom:6px;">Claim Process</h1>
-    <p style="color:var(--muted);font-size:14px;max-width:600px;line-height:1.5;">The API returns a challenge, not a signature. You sign it with your wallet, then submit it back to get the operator proof.</p>
-  </div>
+<!-- DISCOVERY -->
+<section id="discoverySection" style="margin-bottom:32px;">
+  <h1 style="font-size:28px;font-weight:800;line-height:1.1;margin-bottom:6px;">Contract Discovery</h1>
+  <p style="color:var(--muted);font-size:14px;margin-bottom:20px;">Auto-discover all Orochi Network contracts from on-chain data. Reads Airdrop → VestingMain → VestingSub contracts.</p>
 
-  <!-- STEP INDICATORS -->
-  <div class="g p-5 mb-6" style="border-radius:16px;">
-    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-      <div style="display:flex;align-items:center;gap:6px;">
-        <div class="step-badge step-pending" id="stepB1">1</div>
-        <span style="font-size:12px;font-weight:600;" id="stepT1">Connect Wallet</span>
-      </div>
-      <i class="fa-solid fa-arrow-right" style="color:var(--border);font-size:10px;"></i>
-      <div style="display:flex;align-items:center;gap:6px;">
-        <div class="step-badge step-pending" id="stepB2">2</div>
-        <span style="font-size:12px;font-weight:600;" id="stepT2">Get Challenge</span>
-      </div>
-      <i class="fa-solid fa-arrow-right" style="color:var(--border);font-size:10px;"></i>
-      <div style="display:flex;align-items:center;gap:6px;">
-        <div class="step-badge step-pending" id="stepB3">3</div>
-        <span style="font-size:12px;font-weight:600;" id="stepT3">Sign Challenge</span>
-      </div>
-      <i class="fa-solid fa-arrow-right" style="color:var(--border);font-size:10px;"></i>
-      <div style="display:flex;align-items:center;gap:6px;">
-        <div class="step-badge step-pending" id="stepB4">4</div>
-        <span style="font-size:12px;font-weight:600;" id="stepT4">Get Proof</span>
-      </div>
-      <i class="fa-solid fa-arrow-right" style="color:var(--border);font-size:10px;"></i>
-      <div style="display:flex;align-items:center;gap:6px;">
-        <div class="step-badge step-pending" id="stepB5">5</div>
-        <span style="font-size:12px;font-weight:600;" id="stepT5">Submit Claim</span>
-      </div>
+  <div class="g p-5 mb-5">
+    <div style="font-size:13px;font-weight:700;margin-bottom:10px;"><i class="fa-solid fa-magnifying-glass" style="color:var(--accent);margin-right:6px;"></i>Known Starting Point</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div><div style="font-size:11px;color:var(--muted);margin-bottom:3px;">Token Contract</div><div class="alink" style="font-size:11px;" onclick="ct('0x33f6BE84becfF45ea6aA2952d7eF890B44bFB59d')">0x33f6BE84becfF45ea6aA2952d7eF890B44bFB59d</div></div>
+      <div><div style="font-size:11px;color:var(--muted);margin-bottom:3px;">Airdrop Contract (from Etherscan)</div><div class="alink" style="font-size:11px;" onclick="ct('0x0E4EB875eBa6E4B0e4A36C2A7e4f810d16f8b2767')">0x0E4EB875eBa6E4B0e4A36C2A7e4f810d16f8b2767</div></div>
+    </div>
+    <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="btn-big" id="discBtn" onclick="runDiscovery()" disabled><i class="fa-solid fa-satellite-dish" style="margin-right:6px;"></i>Discover All Contracts</button>
+      <button class="btn-s" onclick="owm()">Connect Wallet First</button>
     </div>
   </div>
 
-  <!-- MAIN CLAIM CARD -->
-  <div class="g p-6 sm:p-8 mb-6" style="border-radius:20px;border:1.5px solid rgba(0,232,157,.15);background:linear-gradient(170deg,rgba(0,232,157,.04) 0%,var(--card) 40%,rgba(0,201,255,.03) 100%);">
-    <div style="font-size:10px;color:var(--accent);font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">
-      <i class="fa-solid fa-parachute-box" style="margin-right:4px;"></i> One-Click Claim
-    </div>
-    <h2 style="font-size:24px;font-weight:800;line-height:1.1;margin-bottom:6px;">Claim Your Airdrop</h2>
-    <p style="color:var(--muted);font-size:13px;margin-bottom:20px;">This will: fetch challenge → sign with wallet → get proof → submit claim. All automatic.</p>
+  <div id="discResults" style="display:none;"></div>
+</section>
 
-    <!-- Status -->
-    <div id="claimStatus" style="display:none;margin-bottom:16px;"></div>
+<!-- VESTING SCHEDULES -->
+<section id="vestingSection" style="display:none;margin-bottom:32px;">
+  <h2 style="font-size:22px;font-weight:800;margin-bottom:16px;">Your Vesting Schedules</h2>
+  <div id="vestingResults"></div>
+</section>
 
-    <!-- Timer -->
-    <div id="timerArea" style="display:none;margin-bottom:16px;">
-      <div class="diag-card diag-warn">
-        <div style="display:flex;gap:10px;align-items:center;">
-          <div class="diag-icon"><i class="fa-solid fa-hourglass-half"></i></div>
-          <div>
-            <div style="font-weight:700;font-size:13px;color:var(--warning);">Proof Expires In</div>
-            <div class="timer-text" id="timerDisplay">--:--</div>
-          </div>
-        </div>
-      </div>
-    </div>
+<!-- CLAIM SECTION -->
+<section id="claimSection" style="margin-bottom:32px;">
+  <h2 style="font-size:22px;font-weight:800;margin-bottom:6px;">Claim Airdrop</h2>
+  <p style="color:var(--muted);font-size:14px;margin-bottom:16px;">Challenge-response flow: API gives challenge → you sign → API returns operator proof → submit on-chain.</p>
 
-    <!-- Buttons -->
-    <div style="display:flex;gap:12px;flex-wrap:wrap;">
-      <button class="btn-big" id="claimBtn" onclick="oneClickClaim()" disabled>
-        <i class="fa-solid fa-parachute-box" style="margin-right:6px;"></i>Claim Airdrop
-      </button>
-      <button class="btn-s" onclick="openWalletModal()">
-        <i class="fa-solid fa-wallet" style="margin-right:4px;"></i>Connect Wallet
-      </button>
-    </div>
+  <div id="claimFlow" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;">
+    <div style="display:flex;align-items:center;gap:4px;"><div class="sb sb-p" id="cb1">1</div><span style="font-size:11px;font-weight:600;" id="ct1">Connect</span></div>
+    <i class="fa-solid fa-arrow-right" style="color:var(--border);font-size:9px;align-self:center;"></i>
+    <div style="display:flex;align-items:center;gap:4px;"><div class="sb sb-p" id="cb2">2</div><span style="font-size:11px;font-weight:600;" id="ct2">Challenge</span></div>
+    <i class="fa-solid fa-arrow-right" style="color:var(--border);font-size:9px;align-self:center;"></i>
+    <div style="display:flex;align-items:center;gap:4px;"><div class="sb sb-p" id="cb3">3</div><span style="font-size:11px;font-weight:600;" id="ct3">Sign</span></div>
+    <i class="fa-solid fa-arrow-right" style="color:var(--border);font-size:9px;align-self:center;"></i>
+    <div style="display:flex;align-items:center;gap:4px;"><div class="sb sb-p" id="cb4">4</div><span style="font-size:11px;font-weight:600;" id="ct4">Get Proof</span></div>
+    <i class="fa-solid fa-arrow-right" style="color:var(--border);font-size:9px;align-self:center;"></i>
+    <div style="display:flex;align-items:center;gap:4px;"><div class="sb sb-p" id="cb5">5</div><span style="font-size:11px;font-weight:600;" id="ct5">Claim</span></div>
   </div>
 
-  <!-- API RESPONSE -->
-  <div id="apiArea" style="display:none;margin-bottom:24px;">
-    <div class="g p-5" style="border-radius:16px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <div style="font-size:14px;font-weight:700;"><i class="fa-solid fa-code" style="color:var(--accent2);margin-right:6px;"></i>API Responses</div>
-      </div>
-      <div id="apiLog" style="display:flex;flex-direction:column;gap:8px;"></div>
-    </div>
+  <div id="claimStatus" style="display:none;margin-bottom:16px;"></div>
+  <div id="timerArea" style="display:none;margin-bottom:16px;"></div>
+  <div id="apiLog" style="display:none;margin-bottom:16px;"></div>
+
+  <div style="display:flex;gap:12px;flex-wrap:wrap;">
+    <button class="btn-big" id="claimBtn" onclick="oneClickClaim()" disabled><i class="fa-solid fa-parachute-box" style="margin-right:6px;"></i>One-Click Claim</button>
+    <button class="btn-s" id="vestClaimBtn" onclick="claimVesting()" disabled style="display:none;"><i class="fa-solid fa-unlock" style="margin-right:4px;"></i>Claim Vesting</button>
   </div>
+</section>
 
-  <!-- TWO COLUMNS -->
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-
-    <!-- LEFT: Status -->
-    <div>
-      <div class="g p-5 mb-5" style="border-radius:16px;">
-        <div style="font-size:12px;font-weight:700;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;">Your Status</div>
-        <div id="userStatus"><span style="color:var(--muted);font-size:13px;">Connect wallet to check</span></div>
-      </div>
-
-      <!-- Manual Step-by-Step -->
-      <div class="g p-5" style="border-radius:16px;">
-        <div style="font-size:12px;font-weight:700;color:var(--warning);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;">Manual Steps</div>
-
-        <!-- Step 2: Get Challenge -->
-        <div style="margin-bottom:16px;">
-          <div style="font-size:13px;font-weight:600;margin-bottom:6px;"><span style="color:var(--accent2);">Step 2:</span> Get Challenge</div>
-          <div style="display:flex;gap:8px;margin-bottom:6px;">
-            <input class="inp" id="manAddr" placeholder="0xYourAddress" style="flex:1;"/>
-            <button class="btn-s" onclick="manGetChallenge()" style="padding:8px 14px;font-size:12px;white-space:nowrap;">Fetch</button>
-          </div>
-          <div id="manChallenge" style="display:none;"></div>
-        </div>
-
-        <!-- Step 3: Sign Challenge -->
-        <div style="margin-bottom:16px;">
-          <div style="font-size:13px;font-weight:600;margin-bottom:6px;"><span style="color:var(--accent2);">Step 3:</span> Sign Challenge</div>
-          <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">Sign the challenge message with your wallet.</div>
-          <button class="btn-s" id="manSignBtn" onclick="manSignChallenge()" disabled style="padding:8px 14px;font-size:12px;">
-            <i class="fa-solid fa-pen-nib" style="margin-right:4px;"></i>Sign Challenge
-          </button>
-          <div id="manSignature" style="display:none;"></div>
-        </div>
-
-        <!-- Step 4: Get Proof -->
-        <div style="margin-bottom:16px;">
-          <div style="font-size:13px;font-weight:600;margin-bottom:6px;"><span style="color:var(--accent2);">Step 4:</span> Submit Signed Challenge</div>
-          <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">Send your signed challenge back to the API to get the operator proof.</div>
-          <button class="btn-s" id="manProofBtn" onclick="manGetProof()" disabled style="padding:8px 14px;font-size:12px;">
-            <i class="fa-solid fa-key" style="margin-right:4px;"></i>Get Proof
-          </button>
-          <div id="manProof" style="display:none;"></div>
-        </div>
-
-        <!-- Step 5: Claim -->
-        <div>
-          <div style="font-size:13px;font-weight:600;margin-bottom:6px;"><span style="color:var(--accent2);">Step 5:</span> Submit Claim</div>
-          <button class="btn-s" id="manClaimBtn" onclick="manSubmitClaim()" disabled style="padding:8px 14px;font-size:12px;">
-            <i class="fa-solid fa-paper-plane" style="margin-right:4px;"></i>Submit Claim
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- RIGHT: Explanation -->
-    <div>
-      <div class="g p-5" style="border-radius:16px;">
-        <div style="font-size:12px;font-weight:700;color:var(--danger);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;">Why the API Returns a Challenge</div>
-
-        <div class="diag-card diag-info" style="margin-bottom:12px;">
-          <div style="font-size:12px;color:var(--fg);line-height:1.6;">
-            Ang API ay hindi nagbibigay ng ECDSA proof directly. Instead, gumagamit ng <strong style="color:var(--accent);">challenge-response</strong> flow:
-            <br><br>
-            <strong>1.</strong> Hinihingi ng API na i-prove mo na ikaw ang may-ari ng wallet address.
-            <br>
-            <strong>2.</strong> Binibigyan ka ng <strong style="color:var(--warning);">challenge message</strong> na kailangan mong i-sign.
-            <br>
-            <strong>3.</strong> Kapag nag-sign ka, pinapadala mo yung signature pabalik sa API.
-            <br>
-            <strong>4.</strong> Ang API nag-ve-verify ng signature mo, tapos nag-ge-generate ng <strong style="color:var(--accent);">operator ECDSA proof</strong> para sa iyo.
-            <br>
-            <strong>5.</strong> Ginagamit mo yung proof para i-call ang <code style="color:var(--accent);">claim()</code> sa contract.
-          </div>
-        </div>
-
-        <div class="code-block" style="font-size:10px;margin-bottom:12px;">
-// What the API returns (Step 2)
-{
-  "challenge": "Orochi Network Airdrop Challenge: 73c47b..."
-}
-
-// What you do (Step 3)
-// Sign the challenge string with your wallet
-signature = await signer.signMessage(challenge)
-
-// What you send back (Step 4)
-POST /airdropChallenge
-{
-  "address": "0xYourAddress",
-  "challenge": "Orochi Network Airdrop Challenge: 73c47b...",
-  "signature": "0xa8bbff...1c"
-}
-
-// What the API returns (operator proof)
-{
-  "ecdsaProof": "0x...",
-  "amount": 30000000000000000000,
-  "nonce": 0,
-  "timestamp": 1700000000
-}
-
-// What you submit on-chain (Step 5)
-airdropContract.claim(ecdsaProof, {amount, nonce, timestamp})</div>
-
-        <div class="diag-card diag-warn">
-          <div style="font-size:12px;font-weight:700;color:var(--warning);margin-bottom:4px;"><i class="fa-solid fa-triangle-exclamation" style="margin-right:4px;"></i>5-Minute Expiry</div>
-          <div style="font-size:12px;color:var(--fg);line-height:1.5;">
-            Ang operator proof ay valid lang sa loob ng 5 minutes. Kung hindi mo na-submit bago mag-expire, kailangan mo ulit buong process: fetch challenge → sign → get proof → claim.
-          </div>
-        </div>
-      </div>
-    </div>
+<!-- API EXPLORER -->
+<section style="margin-bottom:32px;">
+  <h2 style="font-size:18px;font-weight:800;margin-bottom:12px;">API Explorer</h2>
+  <p style="color:var(--muted);font-size:13px;margin-bottom:12px;">Test different API endpoints to find the one that accepts the signed challenge.</p>
+  <div class="g p-5">
+    <button class="btn-s" onclick="exploreApi()" style="font-size:12px;padding:8px 16px;"><i class="fa-solid fa-flask" style="margin-right:4px;"></i>Explore All API Endpoints</button>
+    <div id="apiExploreResults" style="display:none;margin-top:12px;"></div>
   </div>
+</section>
 
 </main>
 
 <footer style="border-top:1px solid var(--border);background:var(--bg2);">
-  <div class="max-w-5xl mx-auto px-4 sm:px-6 py-4" style="font-size:11px;color:var(--muted);">
-    Orochi Network Airdrop Claim Tool · API: tge.orochi.network
-  </div>
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4" style="font-size:11px;color:var(--muted);">Orochi Network Contract Discovery & Claim Tool</div>
 </footer>
 </div>
 
@@ -302,422 +162,517 @@ airdropContract.claim(ecdsaProof, {amount, nonce, timestamp})</div>
 // =====================================================================
 // CONFIG
 // =====================================================================
-const TOKEN_ADDR = '0x33f6BE84becfF45ea6aA2952d7eF890B44bFB59d';
-const AIRDROP_ADDR = '0x0E4EB875eBa6E4B0e4A36C2A7e4f810d16f8b2767';
-const API_BASE = 'https://tge.orochi.network/api/v1';
-const PROOF_EXPIRY = 300;
+const TOKEN_ADDR='0x33f6BE84becfF45ea6aA2952d7eF890B44bFB59d';
+const AIRDROP_ADDR='0x0E4EB875eBa6E4B0e4A36C2A7e4f810d16f8b2767';
+const API_BASE='https://tge.orochi.network/api/v1';
+const PROOF_EXPIRY=300;
 
-const TOKEN_ABI = [
-  "function name() view returns (string)",
-  "function symbol() view returns (string)",
-  "function decimals() view returns (uint8)",
-  "function balanceOf(address) view returns (uint256)"
-];
-
-const AIRDROP_ABI = [
-  "function claim(bytes calldata ecdsaProof, tuple(uint256 amount, uint256 nonce, uint64 timestamp) calldata payloadInput) external",
-  "function getAirdropDetail(address) view returns (tuple(uint256 nonce, uint256 redeemed, uint256 timestamp))",
-  "function isOperator(address) view returns (bool)",
-  "function getToken() view returns (address)"
-];
+const TOKEN_ABI=["function name() view returns(string)","function symbol() view returns(string)","function decimals() view returns(uint8)","function totalSupply() view returns(uint256)","function balanceOf(address) view returns(uint256)","function owner() view returns(address)"];
+const AIRDROP_ABI=["function claim(bytes calldata, tuple(uint256 amount, uint256 nonce, uint64 timestamp) calldata) external","function getAirdropDetail(address) view returns(tuple(uint256 nonce, uint256 redeemed, uint256 timestamp))","function isOperator(address) view returns(bool)","function getToken() view returns(address)","function onVestingMain() view returns(address)","function owner() view returns(address)"];
+const VESTING_MAIN_ABI=["function isTGE() view returns(bool)","function getTimeTGE() view returns(uint256)","function getTokenAddress() view returns(address)","function getImplementation() view returns(address)","function getVestingContractTotal() view returns(uint256)","function getVestingContractAddress(uint256) view returns(address)","function getVestingDetailList(uint256,uint256) view returns(tuple(address contractAddress, address beneficiary, uint64 start, uint64 end, uint64 milestoneDuration, uint64 milestoneClaimed, uint256 milestoneReleaseAmount, uint256 unlockedAtTGE, uint256 totalClaimed, uint256 balanceClaimable, uint256 balanceRemain)[])","function owner() view returns(address)","function isTGE() view returns(bool)"];
+const VESTING_SUB_ABI=["function getBeneficiary() view returns(address)","function getClaimableBalance() view returns(uint256)","function getRemainingBalance() view returns(uint256)","function getVestingDetail() view returns(tuple(address contractAddress, address beneficiary, uint64 start, uint64 end, uint64 milestoneDuration, uint64 milestoneClaimed, uint256 milestoneReleaseAmount, uint256 unlockedAtTGE, uint256 totalClaimed, uint256 balanceClaimable, uint256 balanceRemain))","function claim() external"];
 
 // =====================================================================
 // STATE
 // =====================================================================
-let provider, signer, tokenContract, airdropContract;
-let account = null, dec = 18, sym = 'ON';
-let ethersLoaded = false, ethersResolve;
-const ethersReady = new Promise(r => { ethersResolve = r; });
-let proofTimer = null, proofTimestamp = null;
+let provider,signer,tokenC,airdropC,account=null,dec=18,sym='ON';
+let ethersLoaded=false,ethersResolve;
+const ethersReady=new Promise(r=>{ethersResolve=r;});
+let pTimer=null,pTs=null;
 
-// Manual flow state
-let currentChallenge = null;
-let currentSignature = null;
-let currentProof = null;
-let currentPayload = null;
+// Discovered contracts
+let discovered={
+  token:TOKEN_ADDR,
+  airdrop:AIRDROP_ADDR,
+  vestingMain:null,
+  vestingSubs:[],
+  tgeStarted:false,
+  tgeTime:null,
+  vestingOwner:null,
+  airdropOwner:null,
+  tokenOwner:null
+};
+
+// Claim state
+let curChallenge=null,curSig=null,curProof=null,curPayload=null;
+let myVestingSubs=[];
 
 // =====================================================================
 // UTILS
 // =====================================================================
-function toast(msg,type='inf'){const c=document.getElementById('toasts'),t=document.createElement('div');t.className=`toast ${type}`;t.textContent=msg;c.appendChild(t);setTimeout(()=>t.remove(),5200);}
-function copyTxt(t){navigator.clipboard.writeText(t).then(()=>toast('Copied!','ok'));}
-function short(a){return a?a.slice(0,6)+'...'+a.slice(-4):'—';}
-function fmtN(s){const n=parseFloat(s);if(isNaN(n))return s;if(n>=1e9)return(n/1e9).toFixed(2)+'B';if(n>=1e6)return(n/1e6).toFixed(2)+'M';if(n>=1e3)return(n/1e3).toFixed(2)+'K';return n.toLocaleString(undefined,{maximumFractionDigits:4});}
-function netName(id){const m={1:'Ethereum Mainnet',56:'BSC',137:'Polygon',43114:'Avalanche',42161:'Arbitrum',10:'Optimism',8453:'Base',11155111:'Sepolia'};return m[id]||`Chain ${id}`;}
-
-function setStep(current){
-  for(let i=1;i<=5;i++){
-    const b=document.getElementById(`stepB${i}`);
-    const t=document.getElementById(`stepT${i}`);
-    b.className='step-badge '+(i<current?'step-done':i===current?'step-active':'step-pending');
-    if(i<current)b.innerHTML='<i class="fa-solid fa-check" style="font-size:10px;"></i>';
-    else b.textContent=i;
-    t.style.color=i<current?'var(--accent)':i===current?'var(--accent2)':'var(--muted)';
-  }
-}
-
-function addApiLog(step,title,data,type='info'){
-  const area=document.getElementById('apiArea');area.style.display='block';
-  const log=document.getElementById('apiLog');
-  const el=document.createElement('div');
-  el.className=`diag-card diag-${type==='ok'?'ok':type==='err'?'err':'info'}`;
-  el.innerHTML=`<div style="font-weight:700;font-size:12px;color:var(--${type==='ok'?'accent':type==='err'?'danger':'accent2'});margin-bottom:4px;">Step ${step}: ${title}</div><div class="code-block" style="font-size:10px;max-height:150px;">${typeof data==='string'?data:JSON.stringify(data,null,2)}</div>`;
-  log.prepend(el);
-}
-
-function startProofTimer(ts){
-  proofTimestamp=Number(ts);
-  if(proofTimer)clearInterval(proofTimer);
-  document.getElementById('timerArea').style.display='block';
-  const display=document.getElementById('timerDisplay');
-  function update(){
-    const now=Math.floor(Date.now()/1000);
-    const rem=proofTimestamp+PROOF_EXPIRY-now;
-    if(rem<=0){display.textContent='EXPIRED';display.className='timer-text timer-danger';clearInterval(proofTimer);toast('Proof expired!','err');return;}
-    const m=Math.floor(rem/60),s=rem%60;
-    display.textContent=`${m}:${s.toString().padStart(2,'0')}`;
-    display.className='timer-text '+(rem>60?'timer-ok':rem>30?'timer-warn':'timer-danger');
-  }
-  update();proofTimer=setInterval(update,1000);
-}
-function stopProofTimer(){if(proofTimer)clearInterval(proofTimer);document.getElementById('timerArea').style.display='none';}
+function toast(m,t='inf'){const c=document.getElementById('toasts'),e=document.createElement('div');e.className=`toast ${t}`;e.textContent=m;c.appendChild(e);setTimeout(()=>e.remove(),5200);}
+function ct(t){navigator.clipboard.writeText(t).then(()=>toast('Copied!','ok'));}
+function s(a){return a?a.slice(0,6)+'...'+a.slice(-4):'—';}
+function fN(s){const n=parseFloat(s);if(isNaN(n))return s;if(n>=1e9)return(n/1e9).toFixed(2)+'B';if(n>=1e6)return(n/1e6).toFixed(2)+'M';if(n>=1e3)return(n/1e3).toFixed(2)+'K';return n.toLocaleString(undefined,{maximumFractionDigits:4});}
+function nN(id){const m={1:'Ethereum',56:'BSC',137:'Polygon',43114:'Avalanche',42161:'Arbitrum',10:'Optimism',8453:'Base',11155111:'Sepolia'};return m[id]||`Chain ${id}`;}
+function waitForEthers(){return ethersReady;}
+function setClaimStep(cur){for(let i=1;i<=5;i++){const b=document.getElementById(`cb${i}`),t=document.getElementById(`ct${i}`);b.className='sb '+(i<cur?'sb-d':i===cur?'sb-a':'sb-p');if(i<cur)b.innerHTML='<i class="fa-solid fa-check" style="font-size:8px;"></i>';else b.textContent=i;t.style.color=i<cur?'var(--accent)':i===cur?'var(--accent2)':'var(--muted)';}}
 
 // =====================================================================
 // WALLET
 // =====================================================================
-function getWalletProviders(){
-  const w=[];
-  if(window.okxwallet)w.push({id:'okx',name:'OKX Wallet',provider:window.okxwallet});
-  if(window.ethereum&&window.ethereum.isMetaMask)w.push({id:'metamask',name:'MetaMask',provider:window.ethereum});
-  if(window.ethereum&&!window.ethereum.isMetaMask&&!window.okxwallet)w.push({id:'injected',name:'Browser Wallet',provider:window.ethereum});
-  if(window.ethereum&&w.length===0)w.push({id:'injected',name:'Browser Wallet',provider:window.ethereum});
-  return w;
-}
+function gWP(){const w=[];if(window.okxwallet)w.push({id:'okx',n:'OKX',p:window.okxwallet});if(window.ethereum&&window.ethereum.isMetaMask)w.push({id:'mm',n:'MetaMask',p:window.ethereum});if(window.ethereum&&!window.ethereum.isMetaMask&&!window.okxwallet)w.push({id:'inj',n:'Browser',p:window.ethereum});if(window.ethereum&&w.length===0)w.push({id:'inj',n:'Browser',p:window.ethereum});return w;}
+function owm(){const ws=gWP(),m=document.getElementById('wm');const hm=ws.find(w=>w.id==='mm'),ho=ws.find(w=>w.id==='okx');let h='';
+h+=`<div class="wo ${ho?'':'disabled'}" onclick="${ho?"cw('okx')":"void(0)"}"><div class="wi" style="background:#000;border:1px solid #333;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#000" stroke="#fff" stroke-width="1.5"/><path d="M7 8h4v4H7V8zm6 0h4v4h-4V8zm-6 6h4v4H7v-4zm6 0h4v4h-4v-4z" fill="#fff"/></svg></div><div><div style="font-weight:700;font-size:15px;">OKX ${ho?'<span style="color:var(--accent);font-size:11px;">DETECTED</span>':'<span style="color:var(--muted);font-size:11px;">NOT FOUND</span>'}</div></div></div>`;
+h+=`<div class="wo ${hm?'':'disabled'}" onclick="${hm?"cw('mm')":"void(0)"}"><div class="wi" style="background:#f6851b;"><i class="fa-solid fa-mask" style="color:#fff;"></i></div><div><div style="font-weight:700;font-size:15px;">MetaMask ${hm?'<span style="color:var(--accent);font-size:11px;">DETECTED</span>':'<span style="color:var(--muted);font-size:11px;">NOT FOUND</span>'}</div></div></div>`;
+if(!ws.length)h='<div style="text-align:center;padding:20px;color:var(--muted);">No wallet detected.</div>';
+m.innerHTML=`<div class="mo" onclick="cwm(event)"><div class="mb" onclick="event.stopPropagation()"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;"><div style="font-size:18px;font-weight:700;">Connect Wallet</div><button onclick="cwm()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;"><i class="fa-solid fa-xmark"></i></button></div>${h}</div></div>`;m.style.display='block';}
+function cwm(e){if(e&&e.target!==e.currentTarget)return;document.getElementById('wm').style.display='none';}
 
-function openWalletModal(){
-  const wallets=getWalletProviders();const modal=document.getElementById('walletModal');
-  const hasMM=wallets.find(w=>w.id==='metamask');const hasOKX=wallets.find(w=>w.id==='okx');
-  let wh='';
-  wh+=`<div class="wallet-opt ${hasOKX?'':'disabled'}" onclick="${hasOKX?"connectWith('okx')":"void(0)"}"><div class="wicon" style="background:#000;border:1px solid #333;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#000" stroke="#fff" stroke-width="1.5"/><path d="M7 8h4v4H7V8zm6 0h4v4h-4V8zm-6 6h4v4H7v-4zm6 0h4v4h-4v-4z" fill="#fff"/></svg></div><div><div style="font-weight:700;font-size:15px;">OKX Wallet ${hasOKX?'<span style="color:var(--accent);font-size:11px;">DETECTED</span>':'<span style="color:var(--muted);font-size:11px;">NOT FOUND</span>'}</div></div></div>`;
-  wh+=`<div class="wallet-opt ${hasMM?'':'disabled'}" onclick="${hasMM?"connectWith('metamask')":"void(0)"}"><div class="wicon" style="background:#f6851b;"><i class="fa-solid fa-mask" style="color:#fff;"></i></div><div><div style="font-weight:700;font-size:15px;">MetaMask ${hasMM?'<span style="color:var(--accent);font-size:11px;">DETECTED</span>':'<span style="color:var(--muted);font-size:11px;">NOT FOUND</span>'}</div></div></div>`;
-  if(!wallets.length)wh=`<div style="text-align:center;padding:20px;color:var(--muted);">No wallet detected.</div>`;
-  modal.innerHTML=`<div class="modal-overlay" onclick="closeWalletModal(event)"><div class="modal-box" onclick="event.stopPropagation()"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;"><div style="font-size:18px;font-weight:700;">Connect Wallet</div><button onclick="closeWalletModal()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;"><i class="fa-solid fa-xmark"></i></button></div>${wh}</div></div>`;
-  modal.style.display='block';
-}
-function closeWalletModal(e){if(e&&e.target!==e.currentTarget)return;document.getElementById('walletModal').style.display='none';}
-
-async function connectWith(walletId){
-  const wallets=getWalletProviders();const wallet=wallets.find(w=>w.id===walletId);
-  if(!wallet){toast('Wallet not found','err');return;}
-  document.getElementById('walletModal').style.display='none';
+async function cw(id){
+  const ws=gWP(),w=ws.find(x=>x.id===id);if(!w){toast('Wallet not found','err');return;}
+  document.getElementById('wm').style.display='none';
   if(!ethersLoaded){toast('Loading ethers.js...','inf');await waitForEthers();}
-  const nb=document.getElementById('navConn');nb.disabled=true;nb.innerHTML='<span class="spin"></span>';
+  const nb=document.getElementById('nc');nb.disabled=true;nb.innerHTML='<span class="spin"></span>';
   try{
-    provider=new ethers.BrowserProvider(wallet.provider,'any');
-    const accs=await provider.send('eth_requestAccounts',[]);signer=await provider.getSigner();account=accs[0];
-    tokenContract=new ethers.Contract(TOKEN_ADDR,TOKEN_ABI,signer);
-    airdropContract=new ethers.Contract(AIRDROP_ADDR,AIRDROP_ABI,signer);
-    const badge=document.getElementById('sBadge');
-    badge.style.cssText='display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:16px;font-size:11px;font-weight:600;background:rgba(0,232,157,.1);color:var(--accent);border:1px solid rgba(0,232,157,.25);';
-    badge.querySelector('span:first-child').style.background='var(--accent)';
-    document.getElementById('sText').textContent=short(account);
-    nb.innerHTML=`<i class="fa-solid fa-wallet" style="margin-right:4px;"></i>${short(account)}`;nb.disabled=false;
-    document.getElementById('claimBtn').disabled=false;
-    document.getElementById('manAddr').value=account;
-    document.getElementById('manSignBtn').disabled=false;
-    setStep(2);
-    toast(`Connected: ${short(account)}`,'ok');
-    await loadStatus();
-    wallet.provider.on('accountsChanged',async(a)=>{if(!a.length){account=null;return;}account=a[0];await loadStatus();});
-    wallet.provider.on('chainChanged',()=>location.reload());
-  }catch(e){console.error(e);toast('Connection failed: '+(e.reason||e.message||e),'err');nb.innerHTML='Connect';nb.disabled=false;}
-}
-
-async function loadStatus(){
-  if(!account)return;
-  try{
-    const[balance,detail]=await Promise.all([tokenContract.balanceOf(account),airdropContract.getAirdropDetail(account).catch(()=>null)]);
-    const bl=ethers.formatUnits(balance,dec);
-    let h=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">`;
-    h+=`<div><div style="font-size:11px;color:var(--muted);">Balance</div><div class="mono" style="font-size:16px;font-weight:700;color:var(--accent);">${fmtN(bl)} ${sym}</div></div>`;
-    if(detail){h+=`<div><div style="font-size:11px;color:var(--muted);">Nonce</div><div class="mono" style="font-size:16px;font-weight:700;color:var(--accent2);">${detail.nonce.toString()}</div></div>`;
-    h+=`<div><div style="font-size:11px;color:var(--muted);">Redeemed</div><div class="mono" style="font-size:16px;font-weight:700;color:var(--warning);">${fmtN(ethers.formatUnits(detail.redeemed,dec))} ${sym}</div></div>`;}
-    h+=`</div>`;document.getElementById('userStatus').innerHTML=h;
-  }catch(e){console.error(e);}
+    provider=new ethers.BrowserProvider(w.p,'any');
+    const a=await provider.send('eth_requestAccounts',[]);signer=await provider.getSigner();account=a[0];
+    tokenC=new ethers.Contract(TOKEN_ADDR,TOKEN_ABI,signer);
+    airdropC=new ethers.Contract(AIRDROP_ADDR,AIRDROP_ABI,signer);
+    const bg=document.getElementById('sB');bg.style.cssText='display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:16px;font-size:11px;font-weight:600;background:rgba(0,232,157,.1);color:var(--accent);border:1px solid rgba(0,232,157,.25);';bg.querySelector('span:first-child').style.background='var(--accent)';
+    document.getElementById('sT').textContent=s(account);nb.innerHTML=`<i class="fa-solid fa-wallet" style="margin-right:4px;"></i>${s(account)}`;nb.disabled=false;
+    document.getElementById('discBtn').disabled=false;document.getElementById('claimBtn').disabled=false;
+    setClaimStep(2);toast(`Connected via ${w.n}`,'ok');
+    w.p.on('accountsChanged',async(a)=>{if(!a.length){account=null;return;}account=a[0];});
+    w.p.on('chainChanged',()=>location.reload());
+  }catch(e){console.error(e);toast('Failed: '+(e.reason||e.message||e),'err');nb.innerHTML='Connect';nb.disabled=false;}
 }
 
 // =====================================================================
-// API CALLS
+// CONTRACT DISCOVERY
 // =====================================================================
-async function apiGetChallenge(address){
-  const url=`${API_BASE}/airdropChallenge?address=${address}`;
-  const resp=await fetch(url);
-  if(!resp.ok){const t=await resp.text();throw new Error(`API ${resp.status}: ${t}`);}
-  return await resp.json();
-}
+async function runDiscovery(){
+  if(!ethersLoaded||!account){toast('Connect wallet first','err');return;}
+  const btn=document.getElementById('discBtn');btn.disabled=true;btn.innerHTML='<span class="spin" style="margin-right:6px;"></span>Discovering...';
+  const el=document.getElementById('discResults');el.style.display='block';
+  let html='';
 
-async function apiSubmitSignature(address,challenge,signature){
-  // Try multiple possible endpoints and body formats
-  const endpoints=[
-    {url:`${API_BASE}/airdropClaim`,body:{address,challenge,signature}},
-    {url:`${API_BASE}/airdropChallenge`,body:{address,challenge,signature}},
-    {url:`${API_BASE}/airdropProof`,body:{address,challenge,signature}},
-    {url:`${API_BASE}/airdropVerify`,body:{address,challenge,signature}},
-    {url:`${API_BASE}/airdropClaim`,body:{address,signature}},
-    {url:`${API_BASE}/airdropChallenge`,body:{address,signature}},
-    // Try with message field
-    {url:`${API_BASE}/airdropClaim`,body:{address,message:challenge,signature}},
-    {url:`${API_BASE}/airdropChallenge`,body:{address,message:challenge,signature}},
-  ];
+  try{
+    // 1. Token contract
+    html+=`<div class="dc dc-i"><div style="display:flex;gap:10px;align-items:center;"><div class="di"><i class="fa-solid fa-spinner fa-spin"></i></div><div><div style="font-weight:700;color:var(--accent2);">Reading Token contract...</div></div></div></div>`;
+    el.innerHTML=html;
 
-  for(const ep of endpoints){
-    try{
-      const resp=await fetch(ep.url,{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify(ep.body)
-      });
-      if(resp.ok){
-        const data=await resp.json();
-        return {data,endpoint:ep.url,body:ep.body};
+    const[name,symbol,decimals,totalSupply,balance,tOwner]=await Promise.all([
+      tokenC.name(),tokenC.symbol(),tokenC.decimals(),tokenC.totalSupply(),
+      tokenC.balanceOf(account),tokenC.owner()
+    ]);
+    dec=Number(decimals);sym=symbol;
+    discovered.tokenOwner=tOwner;
+
+    html+=card('ok','fa-coins',`Token: ${name} (${symbol})`,
+      `Supply: ${fN(ethers.formatUnits(totalSupply,dec))} ${sym} · Your Balance: ${fN(ethers.formatUnits(balance,dec))} ${sym}`,
+      `Owner: ${s(tOwner)} · Address: ${TOKEN_ADDR}`);
+
+    // 2. Airdrop contract
+    html+=`<div class="dc dc-i"><div style="display:flex;gap:10px;align-items:center;"><div class="di"><i class="fa-solid fa-spinner fa-spin"></i></div><div style="font-weight:700;color:var(--accent2);">Reading Airdrop contract...</div></div></div>`;
+    el.innerHTML=html;
+
+    const[adToken,adVestingMain,adOwner,adDetail]=await Promise.all([
+      airdropC.getToken().catch(()=>null),
+      airdropC.onVestingMain().catch(()=>null),
+      airdropC.owner().catch(()=>null),
+      airdropC.getAirdropDetail(account).catch(()=>null)
+    ]);
+    discovered.airdropOwner=adOwner;
+    if(adVestingMain)discovered.vestingMain=adVestingMain;
+
+    let adInfo=`Owner: ${s(adOwner||'?')}`;
+    if(adToken)adInfo+=` · Token: ${s(adToken)}`;
+    if(adDetail)adInfo+=` · Your Nonce: ${adDetail.nonce.toString()} · Redeemed: ${fN(ethers.formatUnits(adDetail.redeemed,dec))} ${sym}`;
+
+    html+=card('ok','fa-parachute-box','Airdrop Contract',adInfo,`VestingMain: ${adVestingMain?s(adVestingMain):'NOT FOUND'} · Address: ${AIRDROP_ADDR}`);
+
+    // 3. Vesting Main contract
+    if(adVestingMain&&ethers.isAddress(adVestingMain)){
+      html+=`<div class="dc dc-i"><div style="display:flex;gap:10px;align-items:center;"><div class="di"><i class="fa-solid fa-spinner fa-spin"></i></div><div style="font-weight:700;color:var(--accent2);">Reading VestingMain contract...</div></div></div>`;
+      el.innerHTML=html;
+
+      const vmC=new ethers.Contract(adVestingMain,VESTING_MAIN_ABI,provider);
+      const[isTGE,tgeTime,vmToken,vmImpl,vmTotal,vmOwner]=await Promise.all([
+        vmC.isTGE().catch(()=>null),vmC.getTimeTGE().catch(()=>null),
+        vmC.getTokenAddress().catch(()=>null),vmC.getImplementation().catch(()=>null),
+        vmC.getVestingContractTotal().catch(()=>null),vmC.owner().catch(()=>null)
+      ]);
+
+      discovered.tgeStarted=isTGE===true;
+      discovered.tgeTime=tgeTime;
+      discovered.vestingOwner=vmOwner;
+
+      const tgeStatus=isTGE===true?'<span style="color:var(--accent);font-weight:700;">STARTED</span>':'<span style="color:var(--danger);font-weight:700;">NOT STARTED</span>';
+      const tgeDate=tgeTime&&Number(tgeTime)>0?new Date(Number(tgeTime)*1000).toLocaleString():'—';
+
+      html+=card(isTGE?'ok':'e',isTGE?'fa-check-circle':'fa-clock',`VestingMain — TGE: ${isTGE?'STARTED':'NOT STARTED'}`,
+        `isTGE: ${tgeStatus} · TGE Time: ${tgeDate} · Owner: ${s(vmOwner||'?')}`,
+        `Token: ${s(vmToken||'?')} · Implementation: ${s(vmImpl||'?')} · Total Vesting Contracts: ${vmTotal?vmTotal.toString():'?'}`);
+
+      // 4. Read vesting contracts
+      if(vmTotal&&Number(vmTotal)>0){
+        const total=Number(vmTotal);
+        html+=`<div class="dc dc-i"><div style="display:flex;gap:10px;align-items:center;"><div class="di"><i class="fa-solid fa-spinner fa-spin"></i></div><div style="font-weight:700;color:var(--accent2);">Reading ${total} vesting sub-contracts (looking for yours)...</div></div></div>`;
+        el.innerHTML=html;
+
+        // Read in batches
+        const BATCH=20;
+        let subAddrs=[];
+        for(let i=0;i<total;i+=BATCH){
+          const batch=[];
+          for(let j=i;j<Math.min(i+BATCH,total);j++){
+            batch.push(vmC.getVestingContractAddress(j).catch(()=>null));
+          }
+          const results=await Promise.all(batch);
+          subAddrs.push(...results.filter(a=>a&&ethers.isAddress(a)));
+        }
+        discovered.vestingSubs=subAddrs;
+
+        // Find your vesting contracts
+        myVestingSubs=[];
+        let vestHtml='';
+        for(const addr of subAddrs){
+          try{
+            const subC=new ethers.Contract(addr,VESTING_SUB_ABI,provider);
+            const[beneficiary,detail]=await Promise.all([
+              subC.getBeneficiary().catch(()=>null),
+              subC.getVestingDetail().catch(()=>null)
+            ]);
+            if(beneficiary&&beneficiary.toLowerCase()===account.toLowerCase()){
+              myVestingSubs.push({address:addr,detail});
+            }
+          }catch(e){}
+        }
+
+        if(myVestingSubs.length>0){
+          html+=card('ok','fa-user-check',`Found ${myVestingSubs.length} Vesting Schedule(s) For You`,'','');
+          // Show vesting details
+          for(const vs of myVestingSubs){
+            const d=vs.detail;
+            const claimable=d.balanceClaimable?ethers.formatUnits(d.balanceClaimable,dec):'0';
+            const remain=d.balanceRemain?ethers.formatUnits(d.balanceRemain,dec):'0';
+            const totalC=d.totalClaimed?ethers.formatUnits(d.totalClaimed,dec):'0';
+            const start=d.start?new Date(Number(d.start)*1000).toLocaleString():'—';
+            const end=d.end?new Date(Number(d.end)*1000).toLocaleString():'—';
+            const unlocked=d.unlockedAtTGE?ethers.formatUnits(d.unlockedAtTGE,dec):'0';
+            const milestoneAmt=d.milestoneReleaseAmount?ethers.formatUnits(d.milestoneReleaseAmount,dec):'0';
+
+            html+=`<div class="dc dc-ok">
+              <div style="font-weight:700;font-size:13px;color:var(--accent);margin-bottom:8px;">Vesting: ${s(vs.address)}</div>
+              <table class="tbl">
+                <tr><th>Field</th><th>Value</th></tr>
+                <tr><td style="color:var(--muted);">Start</td><td>${start}</td></tr>
+                <tr><td style="color:var(--muted);">End</td><td>${end}</td></tr>
+                <tr><td style="color:var(--muted);">Unlocked at TGE</td><td style="color:var(--accent);font-weight:600;">${fN(unlocked)} ${sym}</td></tr>
+                <tr><td style="color:var(--muted);">Milestone Duration</td><td>${d.milestoneDuration?Number(d.milestoneDuration)/(86400)+' days':'?'}</td></tr>
+                <tr><td style="color:var(--muted);">Milestones Claimed</td><td>${d.milestoneClaimed?d.milestoneClaimed.toString():'?'}</td></tr>
+                <tr><td style="color:var(--muted);">Per Milestone</td><td>${fN(milestoneAmt)} ${sym}</td></tr>
+                <tr><td style="color:var(--warning);font-weight:600;">Claimable Now</td><td style="color:var(--accent);font-weight:700;">${fN(claimable)} ${sym}</td></tr>
+                <tr><td style="color:var(--muted);">Remaining</td><td>${fN(remain)} ${sym}</td></tr>
+                <tr><td style="color:var(--muted);">Total Claimed</td><td>${fN(totalC)} ${sym}</td></tr>
+              </table>
+              ${Number(claimable)>0?`<button class="btn-big" onclick="claimFromVesting('${vs.address}')" style="margin-top:10px;padding:10px 24px;font-size:13px;"><i class="fa-solid fa-unlock" style="margin-right:4px;"></i>Claim ${fN(claimable)} ${sym}</button>`:'<div style="margin-top:8px;font-size:12px;color:var(--muted);">No claimable amount yet.</div>'}
+            </div>`;
+          }
+          document.getElementById('vestClaimBtn').style.display='inline-flex';
+          document.getElementById('vestClaimBtn').disabled=false;
+        }else{
+          html+=card('w','fa-user-xmark','No Vesting Schedules Found For Your Address',`Your address ${s(account)} was not found in any of the ${subAddrs.length} vesting sub-contracts. Your tokens may be in the direct airdrop path instead.`,  '');
+        }
+
+        // Also try getVestingDetailList
+        try{
+          const list=await vmC.getVestingDetailList(0,Math.min(total,100));
+          // Find entries for current user
+          const myEntries=list.filter(e=>e.beneficiary&&e.beneficiary.toLowerCase()===account.toLowerCase());
+          if(myEntries.length>0&&myVestingSubs.length===0){
+            html+=card('ok','fa-list','Found via getVestingDetailList',`Found ${myEntries.length} entries for you via the detail list.`, myEntries.map(e=>`Claimable: ${fN(ethers.formatUnits(e.balanceClaimable,dec))} ${sym} · Remaining: ${fN(ethers.formatUnits(e.balanceRemain,dec))} ${sym} · Contract: ${s(e.contractAddress)}`).join('<br>'));
+          }
+        }catch(e){}
       }
-    }catch(e){
-      // Try next endpoint
-      continue;
+    }else{
+      html+=card('e','fa-link-slash','VestingMain: Not Found','Could not read onVestingMain() from airdrop contract. The contract may not have this function, or the address is wrong.','');
+    }
+
+    // 5. Network info
+    const net=await provider.getNetwork();
+    const bn=await provider.getBlockNumber();
+    const block=await provider.getBlock(bn);
+    html+=card('i','fa-network-wired','Network Info',`${nN(Number(net.chainId))} (Chain ID: ${net.chainId}) · Block #${bn}`,`Block time: ${new Date(Number(block.timestamp)*1000).toLocaleString()} · Your address: ${s(account)}`);
+
+    // Summary
+    const problems=[];
+    if(!discovered.tgeStarted)problems.push('TGE not started — airdrop claims are blocked');
+    if(myVestingSubs.length===0&&(!adDetail||Number(adDetail.redeemed)===0))problems.push('No vesting schedules or airdrop claims found for your address');
+    if(!discovered.vestingMain)problems.push('Could not find VestingMain contract');
+
+    if(problems.length>0){
+      html+=card('e','fa-triangle-exclamation','Problems Found',problems.map((p,i)=>`<strong style="color:var(--danger);">${i+1}.</strong> ${p}`).join('<br>'),'Fix these issues to be able to claim.');
+    }else{
+      html+=card('ok','fa-check-circle','All Checks Passed','You should be able to claim tokens.','Use the One-Click Claim button or claim from vesting schedules above.');
+    }
+
+    el.innerHTML=html;
+    document.getElementById('vestingSection').style.display='block';
+
+  }catch(e){
+    console.error(e);
+    el.innerHTML+=card('e','fa-times-circle','Discovery Error',e.reason||e.message||String(e),'');
+  }finally{
+    btn.disabled=false;btn.innerHTML='<i class="fa-solid fa-satellite-dish" style="margin-right:6px;"></i>Discover All Contracts';
+  }
+}
+
+function card(type,icon,title,detail,extra){
+  const c=type==='ok'?'dc-ok':type==='e'?'dc-e':type==='w'?'dc-w':'dc-i';
+  const ic=type==='ok'?'var(--accent)':type==='e'?'var(--danger)':type==='w'?'var(--warning)':'var(--accent2)';
+  return`<div class="dc ${c}"><div style="display:flex;gap:10px;align-items:flex-start;"><div class="di"><i class="fa-solid ${icon}"></i></div><div style="flex:1;min-width:0;"><div style="font-weight:700;font-size:14px;color:${ic};">${title}</div><div style="font-size:12px;color:var(--fg);margin-top:2px;">${detail}</div>${extra?`<div style="font-size:11px;color:var(--muted);margin-top:4px;">${extra}</div>`:''}</div></div></div>`;
+}
+
+// =====================================================================
+// VESTING CLAIM (no proof needed)
+// =====================================================================
+async function claimFromVesting(subAddr){
+  if(!signer){toast('Connect wallet','err');return;}
+  try{
+    const subC=new ethers.Contract(subAddr,VESTING_SUB_ABI,signer);
+    toast('Confirm claim in your wallet...','inf');
+    const tx=await subC.claim();
+    toast(`TX submitted: ${s(tx.hash)}`,'inf');
+    const r=await tx.wait();
+    toast('Vesting claim successful!','ok');
+    runDiscovery();
+  }catch(e){
+    let m=e.reason||e.message||String(e);
+    if(m.includes('execution reverted:'))m=m.split('execution reverted:').pop().trim();
+    toast('Claim failed: '+m,'err');
+  }
+}
+
+async function claimVesting(){
+  if(myVestingSubs.length===0){toast('No vesting schedules found','err');return;}
+  for(const vs of myVestingSubs){
+    const d=vs.detail;
+    if(d.balanceClaimable&&Number(ethers.formatUnits(d.balanceClaimable,dec))>0){
+      await claimFromVesting(vs.address);
     }
   }
-  throw new Error('All API endpoints failed. The API may not accept browser requests (CORS), or the endpoint format is unknown. Try claiming on the official page: tge.orochi.network');
 }
 
 // =====================================================================
-// ONE-CLICK CLAIM (automated flow)
+// AIRDROP CLAIM (challenge-response)
 // =====================================================================
+async function apiGet(url){
+  const r=await fetch(url);if(!r.ok){const t=await r.text();throw new Error(`${r.status}: ${t}`);}return await r.json();
+}
+async function apiPost(url,body){
+  const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  if(!r.ok){const t=await r.text();throw new Error(`${r.status}: ${t}`);}return await r.json();
+}
+
 async function oneClickClaim(){
   if(!account||!signer){toast('Connect wallet first','err');return;}
-  const btn=document.getElementById('claimBtn');
-  btn.disabled=true;stopProofTimer();
-  const statusEl=document.getElementById('claimStatus');
+  const btn=document.getElementById('claimBtn');btn.disabled=true;
+  const st=document.getElementById('claimStatus');st.style.display='block';
+  stopPT();
 
   try{
-    // STEP 2: Get Challenge
-    setStep(2);
-    statusEl.style.display='block';
-    statusEl.innerHTML=`<div class="diag-card diag-info"><div style="display:flex;gap:10px;align-items:center;"><div class="diag-icon"><i class="fa-solid fa-spinner fa-spin"></i></div><div><div style="font-weight:700;color:var(--accent2);">Step 2: Fetching challenge from API...</div><div style="font-size:12px;color:var(--muted);">GET /airdropChallenge?address=${short(account)}</div></div></div></div>`;
-    btn.innerHTML='<span class="spin" style="margin-right:6px;"></span>Fetching Challenge...';
+    // Step 2: Get challenge
+    setClaimStep(2);
+    st.innerHTML=statusCard('i','fa-spinner fa-spin','Step 2: Fetching challenge...','');
+    btn.innerHTML='<span class="spin" style="margin-right:6px;"></span>Fetching...';
 
-    const challengeData=await apiGetChallenge(account);
-    const challenge=challengeData.challenge||challengeData.message||challengeData.data;
-    if(!challenge)throw new Error('No challenge in API response: '+JSON.stringify(challengeData));
-    currentChallenge=challenge;
+    const chData=await apiGet(`${API_BASE}/airdropChallenge?address=${account}`);
+    const challenge=chData.challenge||chData.message||chData.data;
+    if(!challenge)throw new Error('No challenge in response: '+JSON.stringify(chData).slice(0,200));
+    curChallenge=challenge;
+    logApi('Step 2: Challenge',chData);
 
-    addApiLog('2','Challenge Received',challengeData,'ok');
-
-    // STEP 3: Sign Challenge
-    setStep(3);
-    statusEl.innerHTML=`<div class="diag-card diag-info"><div style="display:flex;gap:10px;align-items:center;"><div class="diag-icon"><i class="fa-solid fa-spinner fa-spin"></i></div><div><div style="font-weight:700;color:var(--accent2);">Step 3: Sign the challenge in your wallet...</div><div style="font-size:12px;color:var(--muted);">Check your wallet popup</div></div></div></div>`;
+    // Step 3: Sign challenge
+    setClaimStep(3);
+    st.innerHTML=statusCard('i','fa-spinner fa-spin','Step 3: Sign the challenge in your wallet...','Check your wallet popup');
     btn.innerHTML='<span class="spin" style="margin-right:6px;"></span>Sign in Wallet...';
 
-    const signature=await signer.signMessage(challenge);
-    currentSignature=signature;
+    curSig=await signer.signMessage(challenge);
+    logApi('Step 3: Signature',{signature:curSig});
 
-    addApiLog('3','Signed Challenge',{challenge,signature:short(signature)+'...'+signature.slice(-6)},'ok');
-
-    // STEP 4: Submit signature to get proof
-    setStep(4);
-    statusEl.innerHTML=`<div class="diag-card diag-info"><div style="display:flex;gap:10px;align-items:center;"><div class="diag-icon"><i class="fa-solid fa-spinner fa-spin"></i></div><div><div style="font-weight:700;color:var(--accent2);">Step 4: Getting operator proof from API...</div><div style="font-size:12px;color:var(--muted);">POSTing your signed challenge</div></div></div></div>`;
+    // Step 4: Get proof — try multiple endpoints
+    setClaimStep(4);
+    st.innerHTML=statusCard('i','fa-spinner fa-spin','Step 4: Getting operator proof...','Trying API endpoints');
     btn.innerHTML='<span class="spin" style="margin-right:6px;"></span>Getting Proof...';
 
-    const proofResult=await apiSubmitSignature(account,challenge,signature);
-    const proofData=proofResult.data;
+    let proofData=null,usedEndpoint='';
+    const endpoints=[
+      {url:`${API_BASE}/airdropClaim`,body:{address:account,challenge,signature:curSig}},
+      {url:`${API_BASE}/airdropChallenge`,body:{address:account,challenge,signature:curSig}},
+      {url:`${API_BASE}/airdropProof`,body:{address:account,challenge,signature:curSig}},
+      {url:`${API_BASE}/airdropVerify`,body:{address:account,challenge,signature:curSig}},
+      {url:`${API_BASE}/airdropClaim`,body:{address:account,signature:curSig}},
+      {url:`${API_BASE}/airdropChallenge`,body:{address:account,signature:curSig}},
+      {url:`${API_BASE}/airdropClaim`,body:{address:account,message:challenge,signature:curSig}},
+      {url:`${API_BASE}/airdropChallenge`,body:{address:account,message:challenge,signature:curSig}},
+      // Try with sig field name
+      {url:`${API_BASE}/airdropClaim`,body:{address:account,challenge,sig:curSig}},
+      {url:`${API_BASE}/airdropChallenge`,body:{address:account,challenge,sig:curSig}},
+    ];
 
-    addApiLog('4','Proof Received',{endpoint:proofResult.endpoint,data:proofData},'ok');
+    for(const ep of endpoints){
+      try{
+        const data=await apiPost(ep.url,ep.body);
+        proofData=data;usedEndpoint=ep.url;
+        break;
+      }catch(e){continue;}
+    }
 
-    // Parse proof data — try to find the fields
-    let ecdsaProof,amount,nonce,timestamp;
+    if(!proofData)throw new Error('All API endpoints failed (CORS or wrong format). Try claiming on tge.orochi.network directly.');
+    logApi(`Step 4: Proof (${s(usedEndpoint)})`,proofData);
+
+    // Parse proof
     const searchObj=proofData.data||proofData;
-
-    // Search for proof
+    let ecdsaProof,amount,nonce,timestamp;
     for(const[k,v] of Object.entries(searchObj)){
       const kl=k.toLowerCase();
-      if((kl.includes('proof')||kl.includes('signature')||kl.includes('ecdsa'))&&typeof v==='string'&&v.startsWith('0x')&&v.length>=64)ecdsaProof=v;
+      if((kl.includes('proof')||kl.includes('signature')||kl.includes('ecdsa'))&&typeof v==='string'&&v.startsWith('0x')&&v.length>=64&&!ecdsaProof)ecdsaProof=v;
       if(kl.includes('amount')&&v)amount=v.toString();
       if(kl.includes('nonce')&&v)nonce=v.toString();
       if((kl.includes('timestamp')||kl.includes('time'))&&v)timestamp=v.toString();
     }
+    if(typeof proofData==='string'&&proofData.startsWith('0x')&&proofData.length>=64)ecdsaProof=proofData;
+    if(!ecdsaProof)throw new Error('No ECDSA proof in response: '+JSON.stringify(proofData).slice(0,300));
 
-    if(!ecdsaProof){
-      // Maybe the API returns the proof directly as a string
-      if(typeof proofData==='string'&&proofData.startsWith('0x'))ecdsaProof=proofData;
-    }
+    curProof=ecdsaProof;curPayload={amount,nonce,timestamp};
+    if(timestamp)startPT(timestamp);
 
-    if(!ecdsaProof){
-      throw new Error('Could not find ECDSA proof in API response. Raw: '+JSON.stringify(proofData).slice(0,200));
-    }
-
-    currentProof=ecdsaProof;
-    currentPayload={amount,nonce,timestamp};
-
-    if(timestamp)startProofTimer(timestamp);
-
-    // STEP 5: Submit claim
-    setStep(5);
-    statusEl.innerHTML=`<div class="diag-card diag-info"><div style="display:flex;gap:10px;align-items:center;"><div class="diag-icon"><i class="fa-solid fa-spinner fa-spin"></i></div><div><div style="font-weight:700;color:var(--accent2);">Step 5: Submitting claim on-chain...</div><div style="font-size:12px;color:var(--muted);">Confirm in your wallet</div></div></div></div>`;
+    // Step 5: Submit claim
+    setClaimStep(5);
+    st.innerHTML=statusCard('i','fa-spinner fa-spin','Step 5: Submitting claim on-chain...','Confirm in wallet');
     btn.innerHTML='<span class="spin" style="margin-right:6px;"></span>Confirm in Wallet...';
 
-    const tx=await airdropContract.claim(ecdsaProof,{amount,nonce,timestamp});
-
-    statusEl.innerHTML=`<div class="diag-card diag-info"><div style="display:flex;gap:10px;align-items:center;"><div class="diag-icon"><i class="fa-solid fa-spinner fa-spin"></i></div><div><div style="font-weight:700;color:var(--accent2);">Waiting for confirmation...</div><div style="font-size:12px;color:var(--muted);">TX: ${short(tx.hash)}</div></div></div></div>`;
+    const tx=await airdropC.claim(ecdsaProof,{amount,nonce,timestamp});
+    st.innerHTML=statusCard('i','fa-spinner fa-spin','Waiting for confirmation...',`TX: ${s(tx.hash)}`);
     btn.innerHTML='<span class="spin" style="margin-right:6px;"></span>Confirming...';
 
-    const receipt=await tx.wait();
-    stopProofTimer();
-
-    // SUCCESS
-    statusEl.innerHTML=`<div class="diag-card diag-ok"><div style="display:flex;gap:10px;align-items:center;"><div class="diag-icon"><i class="fa-solid fa-check-circle"></i></div><div><div style="font-weight:700;color:var(--accent);">Claim Successful!</div><div style="font-size:12px;color:var(--fg);">TX: <span class="alink" onclick="copyTxt('${tx.hash}')">${short(tx.hash)}</span></div></div></div></div>`;
-
-    toast(`Claimed ${amount?fmtN(ethers.formatUnits(amount,dec))+' '+sym:'tokens'}!`,'ok');
-    setStep(6); // All done
-    await loadStatus();
+    await tx.wait();stopPT();
+    st.innerHTML=statusCard('ok','fa-check-circle','Claim Successful!',`${amount?fN(ethers.formatUnits(amount,dec))+' '+sym:'Tokens'} claimed. TX: <span class="alink" onclick="ct('${tx.hash}')">${s(tx.hash)}</span>`);
+    toast('Claim successful!','ok');setClaimStep(6);
 
   }catch(e){
-    console.error('Claim error:',e);
-    stopProofTimer();
-    let msg=e.reason||e.message||String(e);
-    if(msg.includes('execution reverted:'))msg=msg.split('execution reverted:').pop().trim();
-    if(msg.includes('TGENotStarted'))msg='TGE not started yet. Wait for owner to call setTimeTGE().';
-    if(msg.includes('InvalidProofSigner'))msg='Invalid proof signer — operator key may not be registered.';
-    if(msg.includes('InvalidTimestamp'))msg='Proof expired. Try again immediately.';
-    if(msg.includes('InvalidNonce'))msg='Nonce mismatch. Fetch a new proof.';
-    if(msg.includes('user rejected')||msg.includes('denied'))msg='You rejected the wallet signature.';
-
-    statusEl.innerHTML=`<div class="diag-card diag-err"><div style="display:flex;gap:10px;align-items:flex-start;"><div class="diag-icon"><i class="fa-solid fa-times-circle"></i></div><div><div style="font-weight:700;color:var(--danger);">Error</div><div style="font-size:12px;color:var(--fg);word-break:break-all;">${msg}</div></div></div></div>`;
-
-    toast('Error: '+msg,'err');
+    console.error(e);stopPT();
+    let m=e.reason||e.message||String(e);
+    if(m.includes('execution reverted:'))m=m.split('execution reverted:').pop().trim();
+    if(m.includes('user rejected')||m.includes('denied'))m='You rejected the wallet signature.';
+    st.innerHTML=statusCard('e','fa-times-circle','Error',m);
+    toast('Error: '+m,'err');
   }finally{
-    btn.disabled=false;
-    btn.innerHTML='<i class="fa-solid fa-parachute-box" style="margin-right:6px;"></i>Claim Airdrop';
+    btn.disabled=false;btn.innerHTML='<i class="fa-solid fa-parachute-box" style="margin-right:6px;"></i>One-Click Claim';
   }
+}
+
+function statusCard(type,icon,title,detail){
+  const c=type==='ok'?'dc-ok':type==='e'?'dc-e':'dc-i';
+  const ic=type==='ok'?'var(--accent)':type==='e'?'var(--danger)':'var(--accent2)';
+  return`<div class="dc ${c}"><div style="display:flex;gap:10px;align-items:center;"><div class="di"><i class="fa-solid ${icon}"></i></div><div><div style="font-weight:700;color:${ic};">${title}</div><div style="font-size:12px;color:var(--fg);">${detail}</div></div></div></div>`;
+}
+
+function logApi(title,data){
+  const el=document.getElementById('apiLog');el.style.display='block';
+  el.innerHTML+=`<div class="dc dc-i"><div style="font-weight:700;font-size:12px;color:var(--accent2);margin-bottom:4px;">${title}</div><div class="cb">${typeof data==='string'?data:JSON.stringify(data,null,2)}</div></div>`;
 }
 
 // =====================================================================
-// MANUAL STEPS
+// API EXPLORER
 // =====================================================================
-async function manGetChallenge(){
-  const addr=document.getElementById('manAddr').value.trim();
-  if(!addr){toast('Enter an address','err');return;}
-  try{
-    const data=await apiGetChallenge(addr);
-    const challenge=data.challenge||data.message||data.data;
-    if(!challenge){toast('No challenge found in response','err');return;}
-    currentChallenge=challenge;
-    document.getElementById('manChallenge').style.display='block';
-    document.getElementById('manChallenge').innerHTML=`
-      <div class="diag-card diag-ok" style="margin-top:6px;">
-        <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Challenge:</div>
-        <div class="code-block" style="font-size:10px;">${challenge}</div>
-        <button class="btn-s" onclick="copyTxt('${challenge}')" style="margin-top:6px;padding:4px 10px;font-size:10px;">Copy</button>
-      </div>`;
-    addApiLog('2','Challenge Received',data,'ok');
-    setStep(3);
-    toast('Challenge fetched! Now sign it.','ok');
-  }catch(e){toast('Fetch failed: '+(e.message||e),'err');}
-}
+async function exploreApi(){
+  if(!account){toast('Connect wallet first','err');return;}
+  const el=document.getElementById('apiExploreResults');el.style.display='block';
+  el.innerHTML='<div class="dc dc-i"><div class="di" style="display:inline;"><i class="fa-solid fa-spinner fa-spin"></i></div> <span style="color:var(--accent2);">Testing API endpoints...</span></div>';
 
-async function manSignChallenge(){
-  if(!signer){toast('Connect wallet first','err');return;}
-  if(!currentChallenge){toast('Fetch a challenge first','err');return;}
-  try{
-    const sig=await signer.signMessage(currentChallenge);
-    currentSignature=sig;
-    document.getElementById('manSignature').style.display='block';
-    document.getElementById('manSignature').innerHTML=`
-      <div class="diag-card diag-ok" style="margin-top:6px;">
-        <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Your Signature:</div>
-        <div class="code-block" style="font-size:10px;">${sig}</div>
-        <button class="btn-s" onclick="copyTxt('${sig}')" style="margin-top:6px;padding:4px 10px;font-size:10px;">Copy</button>
-      </div>`;
-    document.getElementById('manProofBtn').disabled=false;
-    setStep(4);
-    toast('Challenge signed!','ok');
-  }catch(e){
-    if(e.message.includes('user rejected')||e.message.includes('denied'))toast('You rejected the signature','err');
-    else toast('Sign failed: '+(e.message||e),'err');
-  }
-}
+  let results=[];
 
-async function manGetProof(){
-  if(!account||!currentChallenge||!currentSignature){toast('Missing data','err');return;}
-  try{
-    const result=await apiSubmitSignature(account,currentChallenge,currentSignature);
-    const data=result.data;
-    currentProof=null;currentPayload=null;
+  // Test GET endpoints
+  const getEndpoints=[
+    `${API_BASE}/airdropChallenge?address=${account}`,
+    `${API_BASE}/airdropDetail?address=${account}`,
+    `${API_BASE}/airdrop?address=${account}`,
+    `${API_BASE}/claim?address=${account}`,
+    `${API_BASE}/status`,
+    `${API_BASE}/health`,
+    `${API_BASE}/`,
+  ];
 
-    // Parse
-    const searchObj=data.data||data;
-    let ecdsaProof,amount,nonce,timestamp;
-    for(const[k,v] of Object.entries(searchObj)){
-      const kl=k.toLowerCase();
-      if((kl.includes('proof')||kl.includes('signature')||kl.includes('ecdsa'))&&typeof v==='string'&&v.startsWith('0x')&&v.length>=64)ecdsaProof=v;
-      if(kl.includes('amount')&&v)amount=v.toString();
-      if(kl.includes('nonce')&&v)nonce=v.toString();
-      if((kl.includes('timestamp')||kl.includes('time'))&&v)timestamp=v.toString();
+  for(const url of getEndpoints){
+    try{
+      const r=await fetch(url);
+      const ct=r.headers.get('content-type');
+      let body='';
+      if(ct&&ct.includes('json')){const j=await r.json();body=JSON.stringify(j,null,2);}
+      else{body=await r.text();}
+      results.push({url,method:'GET',status:r.status,ok:r.ok,body:body.slice(0,500),cors:r.headers.get('access-control-allow-origin')||'none'});
+    }catch(e){
+      results.push({url,method:'GET',status:'ERR',ok:false,body:e.message,cors:'—'});
     }
-
-    document.getElementById('manProof').style.display='block';
-    document.getElementById('manProof').innerHTML=`
-      <div class="diag-card diag-ok" style="margin-top:6px;">
-        <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">API Response (endpoint: ${short(result.url||'?')}):</div>
-        <div class="code-block" style="font-size:10px;">${JSON.stringify(data,null,2)}</div>
-      </div>`;
-
-    addApiLog('4','Proof Response',data,'ok');
-
-    if(ecdsaProof&&amount&&nonce&&timestamp){
-      currentProof=ecdsaProof;currentPayload={amount,nonce,timestamp};
-      if(timestamp)startProofTimer(timestamp);
-      document.getElementById('manClaimBtn').disabled=false;
-      setStep(5);
-      toast('Proof received! Ready to claim.','ok');
-    }else{
-      toast('Could not parse proof from response. Check the data manually.','err');
-    }
-  }catch(e){toast('Get proof failed: '+(e.message||e),'err');}
-}
-
-async function manSubmitClaim(){
-  if(!currentProof||!currentPayload){toast('No proof data','err');return;}
-  try{
-    const{amount,nonce,timestamp}=currentPayload;
-    const tx=await airdropContract.claim(currentProof,{amount,nonce,timestamp});
-    toast(`TX submitted: ${short(tx.hash)}`,'inf');
-    const receipt=await tx.wait();
-    stopProofTimer();
-    toast('Claim successful!','ok');
-    setStep(6);
-    await loadStatus();
-  }catch(e){
-    let msg=e.reason||e.message||String(e);
-    if(msg.includes('execution reverted:'))msg=msg.split('execution reverted:').pop().trim();
-    toast('Claim failed: '+msg,'err');
   }
+
+  // Test OPTIONS for POST endpoints
+  const postEndpoints=[
+    `${API_BASE}/airdropClaim`,
+    `${API_BASE}/airdropChallenge`,
+    `${API_BASE}/airdropProof`,
+    `${API_BASE}/airdropVerify`,
+    `${API_BASE}/claim`,
+  ];
+
+  for(const url of postEndpoints){
+    try{
+      const r=await fetch(url,{method:'OPTIONS'});
+      const allow=r.headers.get('access-control-allow-methods')||'';
+      const allowHeaders=r.headers.get('access-control-allow-headers')||'';
+      const cors=r.headers.get('access-control-allow-origin')||'none';
+      results.push({url,method:'OPTIONS',status:r.status,ok:r.ok,body:`Allow-Methods: ${allow}\nAllow-Headers: ${allowHeaders}`,cors});
+    }catch(e){
+      results.push({url,method:'OPTIONS',status:'ERR',ok:false,body:e.message,cors:'—'});
+    }
+  }
+
+  // Render results
+  let html=`<div style="font-size:13px;font-weight:700;margin-bottom:8px;">Results</div>`;
+  html+=`<table class="tbl"><tr><th>Method</th><th>Endpoint</th><th>Status</th><th>CORS</th><th>Body</th></tr>`;
+  for(const r of results){
+    const sc=r.ok?'var(--accent)':r.status==='ERR'?'var(--danger)':'var(--warning)';
+    const cc=r.cors!=='none'?'var(--accent)':'var(--danger)';
+    html+=`<tr>
+      <td style="font-weight:600;color:var(--accent2);">${r.method}</td>
+      <td class="alink" style="font-size:10px;word-break:break-all;" onclick="ct('${r.url}')">${r.url.replace(API_BASE,'')}</td>
+      <td style="color:${sc};font-weight:600;">${r.status}</td>
+      <td style="color:${cc};font-size:10px;">${r.cors!=='none'?'YES':'NO'}</td>
+      <td style="font-size:10px;max-width:300px;word-break:break-all;"><details><summary style="cursor:pointer;color:var(--muted);">Show</summary><div class="cb" style="margin-top:4px;font-size:9px;max-height:150px;">${r.body}</div></details></td>
+    </tr>`;
+  }
+  html+=`</table>`;
+
+  // Analysis
+  const working=results.filter(r=>r.ok);
+  const corsEnabled=results.filter(r=>r.cors!=='none');
+  html+=`<div class="dc dc-i" style="margin-top:10px;">
+    <div style="font-size:12px;font-weight:700;color:var(--accent2);margin-bottom:6px;">Analysis</div>
+    <div style="font-size:12px;color:var(--fg);">
+      <div>Working endpoints: <strong style="color:var(--accent);">${working.length}</strong> / ${results.length}</div>
+      <div>CORS-enabled endpoints: <strong style="color:var(--accent);">${corsEnabled.length}</strong> / ${results.length}</div>
+      ${corsEnabled.length===0?'<div style="color:var(--danger);margin-top:6px;font-weight:600;">No CORS-enabled endpoints found. Browser-based claiming is not possible. Use the official page at tge.orochi.network</div>':''}
+      ${working.length>0?`<div style="color:var(--accent);margin-top:6px;">Working GET endpoints: ${working.map(r=>r.url.replace(API_BASE,'')).join(', ')}</div>`:''}
+    </div>
+  </div>`;
+
+  el.innerHTML=html;
 }
+
+// =====================================================================
+// TIMER
+// =====================================================================
+function startPT(ts){pTs=Number(ts);if(pTimer)clearInterval(pTimer);const area=document.getElementById('timerArea');area.style.display='block';area.innerHTML=`<div class="dc dc-w"><div style="display:flex;gap:10px;align-items:center;"><div class="di"><i class="fa-solid fa-hourglass-half"></i></div><div><div style="font-weight:700;font-size:13px;color:var(--warning);">Proof Expires In</div><div class="mono" style="font-size:14px;font-weight:700;" id="tD">--:--</div></div></div></div>`;
+function u(){const n=Math.floor(Date.now()/1000),r=pTs+PROOF_EXPIRY-n;if(r<=0){document.getElementById('tD').textContent='EXPIRED';document.getElementById('tD').className='mono timer-d';clearInterval(pTimer);toast('Proof expired!','err');return;}const m=Math.floor(r/60),s=r%60;const d=document.getElementById('tD');d.textContent=`${m}:${s.toString().padStart(2,'0')}`;d.className='mono '+(r>60?'timer-ok':r>30?'timer-w':'timer-d');}u();pTimer=setInterval(u,1000);}
+function stopPT(){if(pTimer)clearInterval(pTimer);document.getElementById('timerArea').style.display='none';}
 
 // =====================================================================
 // ETHERS LOADER
 // =====================================================================
-function waitForEthers(){return ethersReady;}
-
-(function(){
-  const s=document.createElement('script');
-  s.src='https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js';
-  s.onload=()=>{
-    ethersLoaded=true;ethersResolve();
-    const wallets=getWalletProviders();
-    (async()=>{for(const w of wallets){try{const a=await w.provider.request({method:'eth_accounts'});if(a&&a.length){await connectWith(w.id);return;}}catch(e){}}})();
-  };
-  s.onerror=()=>toast('Failed to load ethers.js','err');
-  document.head.appendChild(s);
-})();
+(function(){const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js';s.onload=()=>{ethersLoaded=true;ethersResolve();const ws=gWP();(async()=>{for(const w of ws){try{const a=await w.p.request({method:'eth_accounts'});if(a&&a.length){await cw(w.id);return;}}catch(e){}}})();};s.onerror=()=>toast('Failed to load ethers.js','err');document.head.appendChild(s);})();
 </script>
 </body>
 </html>
