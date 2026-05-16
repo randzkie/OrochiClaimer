@@ -4,8 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Orochi Network — All-in-One Dashboard</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
 :root{--bg:#06070b;--bg2:#0c0e17;--card:#10131e80;--border:#1a1e35;--fg:#e2e4f0;--muted:#5a5f7e;--accent:#00e89d;--accent2:#00c9ff;--danger:#ff4d6a;--warning:#ffb84d;--gold:#f5c842;}
@@ -60,29 +59,27 @@ body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--fg)
 .mo{position:fixed;inset:0;z-index:9990;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;}
 .mb{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:28px;max-width:400px;width:90%;animation:slideUp .3s ease;}
 @keyframes slideUp{from{transform:translateY(30px);opacity:0;}to{transform:translateY(0);opacity:1;}}
-.pbar{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:8px;}.pfill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;transition:width .3s;}
+.pbar{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:8px;}
+.pfill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;transition:width .3s;}
 .tab-bar{display:flex;gap:4px;background:var(--bg2);border-radius:14px;padding:4px;border:1px solid var(--border);flex-wrap:wrap;}
 .tab-b{padding:10px 18px;border-radius:10px;font-weight:600;font-size:13px;cursor:pointer;border:none;background:transparent;color:var(--muted);transition:all .25s;font-family:'Space Grotesk',sans-serif;white-space:nowrap;}
-.tab-b:hover{color:var(--fg);}.tab-b.on{background:rgba(0,232,157,.1);color:var(--accent);}
-.tp{display:none;animation:fadeUp .3s ease;}.tp.on{display:block;}
-.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700;}
-.tag-ok{background:rgba(0,232,157,.15);color:var(--accent);border:1px solid rgba(0,232,157,.3);}
-.tag-err{background:rgba(255,77,106,.15);color:var(--danger);border:1px solid rgba(255,77,106,.3);}
-.tag-warn{background:rgba(255,184,77,.15);color:var(--warning);border:1px solid rgba(255,184,77,.3);}
-.tag-info{background:rgba(0,201,255,.15);color:var(--accent2);border:1px solid rgba(0,201,255,.3);}
+.tab-b:hover{color:var(--fg);}
+.tab-b.on{background:rgba(0,232,157,.1);color:var(--accent);}
+.tp{display:none;}.tp.on{display:block;animation:fadeUp .3s ease;}
 .step-b{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;font-weight:700;font-size:10px;flex-shrink:0;}
 .step-d{background:rgba(0,232,157,.15);color:var(--accent);border:1.5px solid rgba(0,232,157,.4);}
 .step-a{background:rgba(0,201,255,.1);color:var(--accent2);border:1.5px solid rgba(0,201,255,.4);animation:pulse 2s ease-in-out infinite;}
 .step-p{background:var(--bg2);color:var(--muted);border:1.5px solid var(--border);}
+@media(max-width:768px){.tab-b{padding:8px 12px;font-size:11px;}}
 </style>
 </head>
 <body>
 <div class="bg-fx"><div class="orb"></div><div class="orb"></div></div>
 <div class="toast-box" id="toasts"></div>
 <div id="wm" style="display:none;"></div>
-
 <div class="wrap">
-<header style="position:sticky;top:0;z-index:50;background:rgba(6,7,11,.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);">
+
+<header style="position:sticky;top:0;z-index:50;background:rgba(6,7,11,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
     <div class="flex items-center gap-3">
       <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#06070b;">ON</div>
@@ -94,7 +91,7 @@ body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--fg)
     </div>
   </div>
   <div class="max-w-6xl mx-auto px-4 sm:px-6 pb-3 overflow-x-auto">
-    <div class="tab-bar">
+    <div class="tab-bar" id="mainTabs">
       <button class="tab-b on" data-t="claim" onclick="swTab('claim')"><i class="fa-solid fa-parachute-box" style="margin-right:4px;"></i>Claim</button>
       <button class="tab-b" data-t="vesting" onclick="swTab('vesting')"><i class="fa-solid fa-lock-open" style="margin-right:4px;"></i>Vesting</button>
       <button class="tab-b" data-t="discovery" onclick="swTab('discovery')"><i class="fa-solid fa-satellite-dish" style="margin-right:4px;"></i>Discovery</button>
@@ -106,14 +103,14 @@ body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--fg)
 
 <main class="max-w-6xl mx-auto px-4 sm:px-6 py-6">
 
-<!-- ===== CLAIM ===== -->
+<!-- CLAIM TAB -->
 <div class="tp on" id="p-claim">
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
     <div class="lg:col-span-2">
       <div class="g p-6" style="border-radius:20px;border:1.5px solid rgba(0,232,157,.15);background:linear-gradient(170deg,rgba(0,232,157,.04) 0%,var(--card) 40%,rgba(0,201,255,.03) 100%);">
         <div style="font-size:10px;color:var(--accent);font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;"><i class="fa-solid fa-parachute-box" style="margin-right:4px;"></i>Airdrop Claim</div>
         <h2 style="font-size:24px;font-weight:800;margin-bottom:4px;">One-Click Claim</h2>
-        <p style="color:var(--muted);font-size:13px;margin-bottom:14px;">Challenge → Sign → Proof → Claim. Automated.</p>
+        <p style="color:var(--muted);font-size:13px;margin-bottom:14px;">Challenge -&gt; Sign -&gt; Proof -&gt; Claim. Automated.</p>
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
           <div style="display:flex;align-items:center;gap:4px;"><div class="step-b step-p" id="c1">1</div><span style="font-size:10px;font-weight:600;">Challenge</span></div>
           <i class="fa-solid fa-arrow-right" style="color:var(--border);font-size:8px;align-self:center;"></i>
@@ -139,24 +136,24 @@ body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--fg)
         <div style="font-size:10px;color:var(--muted);margin-top:4px;">Required. Verify in Scanner tab.</div>
       </div>
       <div class="g p-5" style="font-size:11px;color:var(--muted);line-height:1.5;">
-        <div style="font-weight:700;color:var(--warning);margin-bottom:6px;">Flow</div>
-        <div>1. API gives challenge string<br>2. You sign with wallet<br>3. API returns operator proof<br>4. Submit proof to contract</div>
+        <div style="font-weight:700;color:var(--warning);margin-bottom:6px;">How It Works</div>
+        <div>1. API gives challenge string<br>2. You sign with wallet<br>3. API returns operator proof<br>4. Submit proof to contract<br><br>Proof expires in 5 minutes.</div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ===== VESTING ===== -->
+<!-- VESTING TAB -->
 <div class="tp" id="p-vesting">
   <h2 style="font-size:22px;font-weight:800;margin-bottom:6px;">Vesting Schedules</h2>
   <p style="color:var(--muted);font-size:14px;margin-bottom:16px;">Direct on-chain claim. No API or proof needed. Run Discovery first to load.</p>
   <div id="vestList"><div class="dc dc-i">Run Discovery tab first to find your vesting schedules.</div></div>
 </div>
 
-<!-- ===== DISCOVERY ===== -->
+<!-- DISCOVERY TAB -->
 <div class="tp" id="p-discovery">
   <h2 style="font-size:22px;font-weight:800;margin-bottom:6px;">Contract Discovery</h2>
-  <p style="color:var(--muted);font-size:14px;margin-bottom:16px;">Starts from ONToken → finds VestingMain → scans all sub-contracts for your address.</p>
+  <p style="color:var(--muted);font-size:14px;margin-bottom:16px;">Starts from ONToken -&gt; finds VestingMain -&gt; scans all sub-contracts for your address.</p>
   <div class="g p-5 mb-5">
     <div style="font-size:13px;font-weight:700;margin-bottom:8px;"><i class="fa-solid fa-satellite-dish" style="color:var(--accent);margin-right:6px;"></i>Entry Point: ONToken</div>
     <div class="alink" style="margin-bottom:12px;" onclick="cp('0x33f6BE84becfF45ea6aA2952d7eF890B44bFB59d')">0x33f6BE84becfF45ea6aA2952d7eF890B44bFB59d</div>
@@ -165,17 +162,464 @@ body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--fg)
   <div id="discRes" style="display:none;"></div>
 </div>
 
-<!-- ===== SCANNER ===== -->
+<!-- SCANNER TAB -->
 <div class="tp" id="p-scanner">
-  <h2 style="font-size:22px;font-weight:800;margin-bottom:6px;">API & Contract Scanner</h2>
+  <h2 style="font-size:22px;font-weight:800;margin-bottom:6px;">API &amp; Contract Scanner</h2>
   <p style="color:var(--muted);font-size:14px;margin-bottom:16px;">Brute-force API endpoints with CORS proxies, find contracts on BscScan, verify candidate addresses.</p>
-  <div class="tab-bar mb-5" style="display:inline-flex;">
+  <div class="tab-bar mb-5" style="display:inline-flex;" id="scTabs">
     <button class="tab-b on" data-t="sc-api" onclick="swSub('sc','api')">API Scanner</button>
     <button class="tab-b" data-t="sc-bsc" onclick="swSub('sc','bsc')">BscScan</button>
     <button class="tab-b" data-t="sc-verify" onclick="swSub('sc','verify')">Verify</button>
   </div>
+
   <div id="sc-api" class="tp on">
     <div class="g p-5">
       <div style="font-size:13px;font-weight:700;margin-bottom:8px;">API Endpoint Scanner</div>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
-        <div><label style="font-size:10px;color:var(--muted);display:block;margin-bottom:3px;">API Base URL</label><input class="inp"
+        <div><label style="font-size:10px;color:var(--muted);display:block;margin-bottom:3px;">API Base URL</label><input class="inp" id="apiBase" value="https://tge.orochi.network/api/v1"/></div>
+        <div><label style="font-size:10px;color:var(--muted);display:block;margin-bottom:3px;">Your Address</label><input class="inp" id="scanAddr" placeholder="0x..."/></div>
+      </div>
+      <div style="margin-bottom:10px;">
+        <label style="font-size:10px;color:var(--muted);display:block;margin-bottom:4px;">CORS Proxies</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:12px;">
+          <label style="cursor:pointer;"><input type="checkbox" id="px0" checked/> Direct</label>
+          <label style="cursor:pointer;"><input type="checkbox" id="px1" checked/> corsproxy.io</label>
+          <label style="cursor:pointer;"><input type="checkbox" id="px2"/> allorigins</label>
+        </div>
+      </div>
+      <button class="btn-big" id="scanBtn" onclick="runApiScan()"><i class="fa-solid fa-radar" style="margin-right:6px;"></i>Scan All Endpoints</button>
+      <div class="pbar" id="scanBar" style="display:none;"><div class="pfill" id="scanFill" style="width:0%;"></div></div>
+    </div>
+    <div id="scanRes" style="display:none;"></div>
+  </div>
+
+  <div id="sc-bsc" class="tp">
+    <div class="g p-5">
+      <div style="font-size:13px;font-weight:700;margin-bottom:8px;">BscScan Contract Finder</div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+        <div><label style="font-size:10px;color:var(--muted);display:block;margin-bottom:3px;">Creator Address</label><input class="inp" id="bscAddr" value="0x3cd986F0756cf2c1a401487222c177FF963f27a0"/></div>
+        <div><label style="font-size:10px;color:var(--muted);display:block;margin-bottom:3px;">BscScan API Key (free)</label><input class="inp" id="bscKey" placeholder="Your free key" type="password"/></div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn-big" onclick="scanBsc()"><i class="fa-solid fa-magnifying-glass" style="margin-right:6px;"></i>Find Contracts</button>
+        <a href="https://bscscan.com/address/0x3cd986F0756cf2c1a401487222c177FF963f27a0" target="_blank" class="btn-s" style="text-decoration:none;">Open BscScan</a>
+      </div>
+    </div>
+    <div id="bscRes" style="display:none;"></div>
+  </div>
+
+  <div id="sc-verify" class="tp">
+    <div class="g p-5">
+      <div style="font-size:13px;font-weight:700;margin-bottom:8px;">Verify Airdrop Contract</div>
+      <div style="margin-bottom:10px;"><label style="font-size:10px;color:var(--muted);display:block;margin-bottom:3px;">Candidate Address</label><input class="inp" id="vAddr" placeholder="0x..."/></div>
+      <button class="btn-big" id="vBtn" onclick="verifyContract()" disabled><i class="fa-solid fa-check-double" style="margin-right:6px;"></i>Verify</button>
+    </div>
+    <div id="vRes" style="display:none;"></div>
+  </div>
+</div>
+
+<!-- TOKEN TAB -->
+<div class="tp" id="p-token">
+  <h2 style="font-size:22px;font-weight:800;margin-bottom:6px;">Token Operations</h2>
+  <p style="color:var(--muted);font-size:14px;margin-bottom:16px;">Transfer and approve ON tokens.</p>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+    <div class="g p-5">
+      <div style="font-weight:700;margin-bottom:12px;">Transfer</div>
+      <div class="space-y-3">
+        <div><label style="font-size:10px;color:var(--muted);display:block;margin-bottom:3px;">Recipient</label><input class="inp" id="xfTo" placeholder="0x..."/></div>
+        <div><label style="font-size:10px;color:var(--muted);display:block;margin-bottom:3px;">Amount</label><input class="inp" id="xfAmt" placeholder="100"/></div>
+        <button class="btn-s" id="xfBtn" onclick="doTransfer()" disabled><i class="fa-solid fa-paper-plane" style="margin-right:4px;"></i>Send</button>
+      </div>
+    </div>
+    <div class="g p-5">
+      <div style="font-weight:700;margin-bottom:12px;">Approve</div>
+      <div class="space-y-3">
+        <div><label style="font-size:10px;color:var(--muted);display:block;margin-bottom:3px;">Spender</label><input class="inp" id="apSp" placeholder="0x..."/></div>
+        <div><label style="font-size:10px;color:var(--muted);display:block;margin-bottom:3px;">Amount</label><input class="inp" id="apAmt" placeholder="1000"/></div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-s" id="apBtn" onclick="doApprove()" disabled><i class="fa-solid fa-check" style="margin-right:4px;"></i>Approve</button>
+          <button class="btn-s" id="apMaxBtn" onclick="doApproveMax()" disabled>Max</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+<footer style="border-top:1px solid var(--border);background:var(--bg2);"><div class="max-w-6xl mx-auto px-4 sm:px-6 py-4" style="font-size:11px;color:var(--muted);">Orochi Network All-in-One Dashboard</div></footer>
+</div>
+
+<script>
+/* ===== CONFIG ===== */
+const T_ADDR='0x33f6BE84becfF45ea6aA2952d7eF890B44bFB59d';
+const API_BASE='https://tge.orochi.network/api/v1';
+const PROOF_EXP=300;
+const T_ABI=["function name() view returns(string)","function symbol() view returns(string)","function decimals() view returns(uint8)","function totalSupply() view returns(uint256)","function balanceOf(address) view returns(uint256)","function owner() view returns(address)"];
+const AD_ABI=["function claim(bytes calldata,tuple(uint256 amount,uint256 nonce,uint64 timestamp) calldata) external","function getAirdropDetail(address) view returns(tuple(uint256 nonce,uint256 redeemed,uint256 timestamp))","function isOperator(address) view returns(bool)","function getToken() view returns(address)","function onVestingMain() view returns(address)","function owner() view returns(address)"];
+const VM_ABI=["function isTGE() view returns(bool)","function getTimeTGE() view returns(uint256)","function getTokenAddress() view returns(address)","function getVestingContractTotal() view returns(uint256)","function getVestingContractAddress(uint256) view returns(address)","function getVestingDetailList(uint256,uint256) view returns(tuple(address contractAddress,address beneficiary,uint64 start,uint64 end,uint64 milestoneDuration,uint64 milestoneClaimed,uint256 milestoneReleaseAmount,uint256 unlockedAtTGE,uint256 totalClaimed,uint256 balanceClaimable,uint256 balanceRemain)[])","function owner() view returns(address)"];
+const VS_ABI=["function getBeneficiary() view returns(address)","function getClaimableBalance() view returns(uint256)","function getRemainingBalance() view returns(uint256)","function getVestingDetail() view returns(tuple(address contractAddress,address beneficiary,uint64 start,uint64 end,uint64 milestoneDuration,uint64 milestoneClaimed,uint256 milestoneReleaseAmount,uint256 unlockedAtTGE,uint256 totalClaimed,uint256 balanceClaimable,uint256 balanceRemain))","function claim() external"];
+
+/* ===== STATE ===== */
+let provider,signer,tC,account=null,dec=18,sym='ON';
+let ethL=false,ethR;const ethP=new Promise(r=>{ethR=r;});
+let pTmr=null;
+let disc={vmAddr:null,isTGE:false,subs:[],mySubs:[]};
+let curCh=null,curSig=null;
+
+/* ===== UTILS ===== */
+function toast(m,t='inf'){const c=document.getElementById('toasts'),e=document.createElement('div');e.className=`toast ${t}`;e.textContent=m;c.appendChild(e);setTimeout(()=>e.remove(),5200);}
+function cp(t){navigator.clipboard.writeText(t).then(()=>toast('Copied!','ok'));}
+function s(a){return a?a.slice(0,6)+'...'+a.slice(-4):'—';}
+function fN(s){const n=parseFloat(s);if(isNaN(n))return s;if(n>=1e9)return(n/1e9).toFixed(2)+'B';if(n>=1e6)return(n/1e6).toFixed(2)+'M';if(n>=1e3)return(n/1e3).toFixed(2)+'K';return n.toLocaleString(undefined,{maximumFractionDigits:4});}
+function nN(id){const m={1:'Ethereum',56:'BSC',137:'Polygon'};return m[id]||'Chain '+id;}
+function mc(type,icon,title,detail,extra){const c=type==='ok'?'dc-ok':type==='e'?'dc-e':type==='w'?'dc-w':'dc-i';const ic=type==='ok'?'var(--accent)':type==='e'?'var(--danger)':type==='w'?'var(--warning)':'var(--accent2)';return`<div class="dc ${c}"><div style="display:flex;gap:10px;align-items:flex-start;"><div class="di"><i class="fa-solid ${icon}"></i></div><div style="flex:1;min-width:0;"><div style="font-weight:700;font-size:14px;color:${ic};">${title}</div><div style="font-size:12px;color:var(--fg);margin-top:2px;word-break:break-all;">${detail}</div>${extra?`<div style="font-size:11px;color:var(--muted);margin-top:4px;">${extra}</div>`:''}</div></div></div>`;}
+
+/* ===== TABS ===== */
+function swTab(id){document.querySelectorAll('#mainTabs .tab-b').forEach(b=>b.classList.toggle('on',b.dataset.t===id));document.querySelectorAll('main>.tp').forEach(p=>p.classList.toggle('on',p.id===`p-${id}`));}
+function swSub(pre,id){document.querySelectorAll(`#${pre}Tabs .tab-b`).forEach(b=>b.classList.toggle('on',b.dataset.t===`${pre}-${id}`));document.querySelectorAll(`#p-${pre}>.tp`).forEach(p=>p.classList.toggle('on',p.id===`${pre}-${id}`));}
+
+/* ===== WALLET ===== */
+function gWP(){const w=[];if(window.okxwallet)w.push({id:'okx',n:'OKX',p:window.okxwallet});if(window.ethereum&&window.ethereum.isMetaMask)w.push({id:'mm',n:'MetaMask',p:window.ethereum});if(window.ethereum&&!window.ethereum.isMetaMask&&!window.okxwallet)w.push({id:'inj',n:'Browser',p:window.ethereum});if(window.ethereum&&w.length===0)w.push({id:'inj',n:'Browser',p:window.ethereum});return w;}
+function owm(){const ws=gWP(),m=document.getElementById('wm');const hm=ws.find(w=>w.id==='mm'),ho=ws.find(w=>w.id==='okx');let h='';
+h+=`<div class="wo ${ho?'':'disabled'}" onclick="${ho?"cw('okx')":'void(0)'}"><div class="wi" style="background:#000;border:1px solid #333;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#000" stroke="#fff" stroke-width="1.5"/><path d="M7 8h4v4H7V8zm6 0h4v4h-4V8zm-6 6h4v4H7v-4zm6 0h4v4h-4v-4z" fill="#fff"/></svg></div><div style="font-weight:700;">OKX ${ho?'<span style="color:var(--accent);font-size:11px;">DETECTED</span>':'<span style="color:var(--muted);font-size:11px;">NOT FOUND</span>'}</div></div>`;
+h+=`<div class="wo ${hm?'':'disabled'}" onclick="${hm?"cw('mm')":'void(0)'}"><div class="wi" style="background:#f6851b;"><i class="fa-solid fa-mask" style="color:#fff;"></i></div><div style="font-weight:700;">MetaMask ${hm?'<span style="color:var(--accent);font-size:11px;">DETECTED</span>':'<span style="color:var(--muted);font-size:11px;">NOT FOUND</span>'}</div></div>`;
+if(!ws.length)h='<div style="text-align:center;padding:20px;color:var(--muted);">No wallet detected. Install OKX or MetaMask.</div>';
+m.innerHTML=`<div class="mo" onclick="cwm(event)"><div class="mb" onclick="event.stopPropagation()"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;"><div style="font-size:18px;font-weight:700;">Connect Wallet</div><button onclick="cwm()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;"><i class="fa-solid fa-xmark"></i></button></div>${h}</div></div>`;m.style.display='block';}
+function cwm(e){if(e&&e.target!==e.currentTarget)return;document.getElementById('wm').style.display='none';}
+
+async function cw(id){
+const ws=gWP(),w=ws.find(x=>x.id===id);if(!w){toast('Not found','err');return;}
+document.getElementById('wm').style.display='none';
+if(!ethL){toast('Loading ethers.js...','inf');await ethP;}
+const nb=document.getElementById('nc');nb.disabled=true;nb.innerHTML='<span class="spin"></span>';
+try{
+provider=new ethers.BrowserProvider(w.p,'any');
+const a=await provider.send('eth_requestAccounts',[]);signer=await provider.getSigner();account=a[0];
+tC=new ethers.Contract(T_ADDR,T_ABI,signer);
+const bg=document.getElementById('sB');bg.style.cssText='display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:16px;font-size:11px;font-weight:600;background:rgba(0,232,157,.1);color:var(--accent);border:1px solid rgba(0,232,157,.25);';bg.querySelector('span:first-child').style.background='var(--accent)';
+document.getElementById('sT').textContent=s(account);nb.innerHTML=`<i class="fa-solid fa-wallet" style="margin-right:4px;"></i>${s(account)}`;nb.disabled=false;
+['discBtn','claimBtn','xfBtn','apBtn','apMaxBtn','vBtn'].forEach(id=>{const el=document.getElementById(id);if(el)el.disabled=false;});
+document.getElementById('scanAddr').value=account;
+toast(`Connected via ${w.n}`,'ok');loadClaimInfo();
+w.p.on('accountsChanged',async(a)=>{if(!a.length){account=null;return;}account=a[0];loadClaimInfo();});
+w.p.on('chainChanged',()=>location.reload());
+}catch(e){console.error(e);toast('Failed: '+(e.reason||e.message||e),'err');nb.innerHTML='Connect';nb.disabled=false;}
+}
+
+async function loadClaimInfo(){
+if(!account)return;
+try{
+const[bal,det]=await Promise.all([tC.balanceOf(account),getAD().getAirdropDetail(account).catch(()=>null)]);
+const bl=ethers.formatUnits(bal,dec);
+let h=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">`;
+h+=`<div><div style="font-size:10px;color:var(--muted);">Balance</div><div class="mono" style="font-size:16px;font-weight:700;color:var(--accent);">${fN(bl)} ${sym}</div></div>`;
+if(det)h+=`<div><div style="font-size:10px;color:var(--muted);">Nonce</div><div class="mono" style="font-size:16px;font-weight:700;color:var(--accent2);">${det.nonce.toString()}</div></div><div><div style="font-size:10px;color:var(--muted);">Redeemed</div><div class="mono" style="font-size:14px;font-weight:600;color:var(--warning);">${fN(ethers.formatUnits(det.redeemed,dec))}</div></div>`;
+h+=`</div>`;document.getElementById('claimInfo').innerHTML=h;
+}catch(e){console.error(e);}
+}
+
+function getAD(){const a=document.getElementById('adAddr').value.trim();return new ethers.Contract(a,AD_ABI,signer||provider);}
+
+/* ===== CLAIM STEPS ===== */
+function setCS(c){for(let i=1;i<=4;i++){const b=document.getElementById(`c${i}`);b.className='step-b '+(i<c?'step-d':i===c?'step-a':'step-p');if(i<c)b.innerHTML='<i class="fa-solid fa-check" style="font-size:8px;"></i>';else b.textContent=i;}}
+function spTS(ts){const pts=Number(ts);if(pTmr)clearInterval(pTmr);const a=document.getElementById('claimTimer');a.style.display='block';a.innerHTML=`<div class="dc dc-w"><div style="display:flex;gap:10px;align-items:center;"><div class="di"><i class="fa-solid fa-hourglass-half"></i></div><div><div style="font-weight:700;font-size:12px;color:var(--warning);">Proof Expires In</div><div class="mono" style="font-size:14px;font-weight:700;" id="tD">--:--</div></div></div></div>`;
+function u(){const n=Math.floor(Date.now()/1000),r=pts+PROOF_EXP-n;if(r<=0){document.getElementById('tD').textContent='EXPIRED';document.getElementById('tD').style.color='var(--danger)';clearInterval(pTmr);return;}const m=Math.floor(r/60),s=r%60;const d=document.getElementById('tD');d.textContent=`${m}:${s.toString().padStart(2,'0')}`;d.style.color=r>60?'var(--accent)':r>30?'var(--warning)':'var(--danger)';}u();pTmr=setInterval(u,1000);}
+function spPT(){if(pTmr)clearInterval(pTmr);document.getElementById('claimTimer').style.display='none';}
+function lCl(t,d){const el=document.getElementById('claimLog');el.style.display='block';el.innerHTML+=`<div class="dc dc-i"><div style="font-weight:700;font-size:11px;color:var(--accent2);margin-bottom:3px;">${t}</div><div class="cb">${typeof d==='string'?d:JSON.stringify(d,null,2)}</div></div>`;}
+
+/* ===== ONE-CLICK CLAIM ===== */
+async function oneClickClaim(){
+if(!account||!signer){toast('Connect wallet','err');return;}
+const adA=document.getElementById('adAddr').value.trim();
+if(!adA||!ethers.isAddress(adA)){toast('Enter airdrop address','err');return;}
+const adC=new ethers.Contract(adA,AD_ABI,signer);
+const btn=document.getElementById('claimBtn');btn.disabled=true;
+const st=document.getElementById('claimSt');st.style.display='block';spPT();
+document.getElementById('claimLog').style.display='none';
+try{
+setCS(1);st.innerHTML=mc('i','fa-spinner fa-spin','Step 1: Fetching challenge...','');btn.innerHTML='<span class="spin" style="margin-right:6px;"></span>Fetching...';
+const chD=await fetch(`${API_BASE}/airdropChallenge?address=${account}`).then(r=>{if(!r.ok)throw new Error(r.status);return r.json();});
+const ch=chD.challenge||chD.message||chD.data;if(!ch)throw new Error('No challenge: '+JSON.stringify(chD).slice(0,150));curCh=ch;
+lCl('Challenge',chD);
+
+setCS(2);st.innerHTML=mc('i','fa-spinner fa-spin','Step 2: Sign in wallet...','Check popup');btn.innerHTML='<span class="spin" style="margin-right:6px;"></span>Sign...';
+curSig=await signer.signMessage(ch);
+lCl('Signature',{sig:curSig.slice(0,20)+'...'});
+
+setCS(3);st.innerHTML=mc('i','fa-spinner fa-spin','Step 3: Getting proof...','Trying endpoints');btn.innerHTML='<span class="spin" style="margin-right:6px;"></span>Proof...';
+let pD=null;
+const eps=[
+{url:`${API_BASE}/airdropClaim`,b:{address:account,challenge:ch,signature:curSig}},
+{url:`${API_BASE}/airdropChallenge`,b:{address:account,challenge:ch,signature:curSig}},
+{url:`${API_BASE}/airdropProof`,b:{address:account,challenge:ch,signature:curSig}},
+{url:`${API_BASE}/airdropClaim`,b:{address:account,signature:curSig}},
+{url:`${API_BASE}/airdropChallenge`,b:{address:account,signature:curSig}},
+{url:`${API_BASE}/airdropClaim`,b:{address:account,message:ch,signature:curSig}},
+];
+const pxs=['','https://corsproxy.io/?'];
+for(const px of pxs){for(const ep of eps){try{const r=await fetch(px+ep.url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(ep.b)});if(r.ok){pD=await r.json();break;}}catch(e){continue;}}if(pD)break;}
+if(!pD)throw new Error('All endpoints failed. CORS blocking? Try tge.orochi.network directly or use Scanner tab.');
+lCl('Proof',pD);
+
+const sr=pD.data||pD;let eP,am,no,ts;
+for(const[k,v]of Object.entries(sr)){const kl=k.toLowerCase();
+if((kl.includes('proof')||kl.includes('ecdsa'))&&typeof v==='string'&&v.startsWith('0x')&&v.length>=64&&!eP)eP=v;
+if(kl.includes('amount')&&v)am=v.toString();
+if(kl.includes('nonce')&&v)no=v.toString();
+if((kl.includes('timestamp')||kl.includes('time'))&&v)ts=v.toString();}
+if(typeof pD==='string'&&pD.startsWith('0x')&&pD.length>=64)eP=pD;
+if(!eP)throw new Error('No proof in response: '+JSON.stringify(pD).slice(0,200));
+if(ts)spTS(ts);
+
+setCS(4);st.innerHTML=mc('i','fa-spinner fa-spin','Step 4: Submitting on-chain...','Confirm in wallet');btn.innerHTML='<span class="spin" style="margin-right:6px;"></span>Confirm...';
+const tx=await adC.claim(eP,{amount:am,nonce:no,timestamp:ts});
+st.innerHTML=mc('i','fa-spinner fa-spin','Confirming...',`TX: ${s(tx.hash)}`);btn.innerHTML='<span class="spin" style="margin-right:6px;"></span>Wait...';
+await tx.wait();spPT();
+st.innerHTML=mc('ok','fa-check-circle','Claim Successful!',`${am?fN(ethers.formatUnits(am,dec))+' '+sym:'Tokens'} claimed. TX: <span class="alink" onclick="cp('${tx.hash}')">${s(tx.hash)}</span>`);
+toast('Claim successful!','ok');setCS(5);loadClaimInfo();
+}catch(e){console.error(e);spPT();let m=e.reason||e.message||String(e);if(m.includes('execution reverted:'))m=m.split('execution reverted:').pop().trim();if(m.includes('user rejected'))m='You rejected the signature.';
+st.innerHTML=mc('e','fa-times-circle','Error',m);toast('Error: '+m,'err');
+}finally{btn.disabled=false;btn.innerHTML='<i class="fa-solid fa-parachute-box" style="margin-right:6px;"></i>Claim Airdrop';}
+}
+
+/* ===== DISCOVERY ===== */
+async function runDiscovery(){
+if(!ethL||!account){toast('Connect wallet','err');return;}
+const btn=document.getElementById('discBtn');btn.disabled=true;btn.innerHTML='<span class="spin" style="margin-right:6px;"></span>Scanning...';
+const el=document.getElementById('discRes');el.style.display='block';let html='';
+
+try{
+const[nm,sb,dc,ts,bl,tO]=await Promise.all([tC.name(),tC.symbol(),tC.decimals(),tC.totalSupply(),tC.balanceOf(account),tC.owner()]);
+dec=Number(dc);sym=sb;
+html+=mc('ok','fa-coins',`Token: ${nm} (${sb})`,`Supply: ${fN(ethers.formatUnits(ts,dec))} · Balance: ${fN(ethers.formatUnits(bl,dec))}`,`Owner: ${s(tO)} (likely VestingMain)`);
+
+const vmA=tO;disc.vmAddr=vmA;
+html+=`<div class="dc dc-i"><div class="di"><i class="fa-solid fa-spinner fa-spin"></i></div> Reading VestingMain at ${s(vmA)}...</div>`;
+el.innerHTML=html;
+
+let vmC;try{vmC=new ethers.Contract(vmA,VM_ABI,provider);
+const[isTGE,tgeT,vmT,vmTot,vmO]=await Promise.all([vmC.isTGE().catch(()=>null),vmC.getTimeTGE().catch(()=>null),vmC.getTokenAddress().catch(()=>null),vmC.getVestingContractTotal().catch(()=>null),vmC.owner().catch(()=>null)]);
+disc.isTGE=isTGE===true;
+const tgeD=tgeT&&Number(tgeT)>0?new Date(Number(tgeT)*1000).toLocaleString():'—';
+html=html.replace(/<div class="dc dc-i">.*?Reading VestingMain.*?<\/div>/,'');
+html+=mc(isTGE?'ok':'e',isTGE?'fa-check-circle':'fa-clock',`VestingMain — TGE: ${isTGE?'STARTED':'NOT STARTED'}`,`isTGE: ${isTGE} · TGE Time: ${tgeD} · Owner: ${s(vmO||'?')} · Total Subs: ${vmTot?Number(vmTot):0}`,`Token: ${s(vmT||'?')}`);
+
+if(vmTot&&Number(vmTot)>0){
+const tot=Number(vmTot);
+html+=`<div class="dc dc-i"><div class="di"><i class="fa-solid fa-spinner fa-spin"></i></div> Scanning ${tot} sub-contracts...</div>`;
+el.innerHTML=html;
+
+const BATCH=30;let sA=[];
+for(let i=0;i<tot;i+=BATCH){const b=[];for(let j=i;j<Math.min(i+BATCH,tot);j++)b.push(vmC.getVestingContractAddress(j).catch(()=>null));
+sA.push(...(await Promise.all(b)).filter(a=>a&&ethers.isAddress(a)));}
+
+disc.mySubs=[];
+for(const a of sA){try{const c=new ethers.Contract(a,VS_ABI,provider);const ben=await c.getBeneficiary().catch(()=>null);
+if(ben&&ben.toLowerCase()===account.toLowerCase()){const d=await c.getVestingDetail().catch(()=>null);disc.mySubs.push({address:a,detail:d});}}catch(e){}}
+
+html=html.replace(/<div class="dc dc-i">.*?Scanning.*?<\/div>/,'');
+
+if(disc.mySubs.length>0){
+html+=mc('ok','fa-user-check',`Found ${disc.mySubs.length} Vesting Schedule(s) For You`,'See Vesting tab for details.','');
+let vh='';
+for(const vs of disc.mySubs){const d=vs.detail;if(!d)continue;
+const cl=d.balanceClaimable?ethers.formatUnits(d.balanceClaimable,dec):'0';
+const rm=d.balanceRemain?ethers.formatUnits(d.balanceRemain,dec):'0';
+const tc=d.totalClaimed?ethers.formatUnits(d.totalClaimed,dec):'0';
+const st2=d.start&&Number(d.start)>0?new Date(Number(d.start)*1000).toLocaleString():'—';
+const en=d.end&&Number(d.end)>0?new Date(Number(d.end)*1000).toLocaleString():'—';
+const ul=d.unlockedAtTGE?ethers.formatUnits(d.unlockedAtTGE,dec):'0';
+const ma=d.milestoneReleaseAmount?ethers.formatUnits(d.milestoneReleaseAmount,dec):'0';
+const md=d.milestoneDuration?Number(d.milestoneDuration)/86400:'?';
+const mcl=d.milestoneClaimed?d.milestoneClaimed.toString():'0';
+const canC=Number(cl)>0;
+vh+=`<div class="dc dc-ok">
+<div style="font-weight:700;font-size:14px;color:var(--accent);margin-bottom:8px;">Vesting: <span class="alink" onclick="cp('${vs.address}')">${s(vs.address)}</span></div>
+<table class="tbl"><tr><th>Field</th><th>Value</th></tr>
+<tr><td style="color:var(--muted);">Start</td><td>${st2}</td></tr>
+<tr><td style="color:var(--muted);">End</td><td>${en}</td></tr>
+<tr><td style="color:var(--muted);">Unlocked at TGE</td><td style="color:var(--accent);">${fN(ul)} ${sym}</td></tr>
+<tr><td style="color:var(--muted);">Milestone Duration</td><td>${md} days</td></tr>
+<tr><td style="color:var(--muted);">Per Milestone</td><td>${fN(ma)} ${sym}</td></tr>
+<tr><td style="color:var(--muted);">Milestones Claimed</td><td>${mcl}</td></tr>
+<tr><td style="color:var(--warning);font-weight:700;">Claimable Now</td><td style="color:var(--accent);font-weight:700;font-size:16px;">${fN(cl)} ${sym}</td></tr>
+<tr><td style="color:var(--muted);">Remaining</td><td>${fN(rm)} ${sym}</td></tr>
+<tr><td style="color:var(--muted);">Total Claimed</td><td>${fN(tc)} ${sym}</td></tr>
+</table>
+ ${canC?`<button class="btn-big" onclick="claimVest('${vs.address}')" style="margin-top:10px;padding:10px 24px;font-size:13px;"><i class="fa-solid fa-unlock" style="margin-right:4px;"></i>Claim ${fN(cl)} ${sym}</button>`:'<div style="margin-top:8px;padding:8px 12px;border-radius:8px;background:var(--bg2);font-size:12px;color:var(--muted);">No claimable amount yet.</div>'}
+</div>`;
+}
+document.getElementById('vestList').innerHTML=vh;
+}else{html+=mc('w','fa-user-xmark','No Vesting Schedules Found',`Address ${s(account)} not found in ${sA.length} sub-contracts.`,'');}
+}else{html+=mc('w','fa-info-circle','No sub-contracts found','Total is 0 or unreadable.','');}
+}catch(e){html+=mc('e','fa-times-circle','VestingMain Failed',`Address ${s(vmA)} not readable as VestingMain.`,(e.reason||e.message||'').slice(0,150));}
+
+const net=await provider.getNetwork();const bn=await provider.getBlockNumber();
+html+=mc('i','fa-network-wired','Network',`${nN(Number(net.chainId))} · Block #${bn}`,`Address: ${s(account)}`);
+el.innerHTML=html;
+}catch(e){console.error(e);el.innerHTML+=mc('e','fa-times-circle','Error',(e.reason||e.message||'').slice(0,300),'');
+}finally{btn.disabled=false;btn.innerHTML='<i class="fa-solid fa-satellite-dish" style="margin-right:6px;"></i>Discover All';}
+}
+
+/* ===== VESTING CLAIM ===== */
+async function claimVest(addr){
+if(!signer){toast('Connect wallet','err');return;}
+try{const c=new ethers.Contract(addr,VS_ABI,signer);toast('Confirm in wallet...','inf');const tx=await c.claim();toast(`TX: ${s(tx.hash)}`,'inf');await tx.wait();toast('Claimed!','ok');runDiscovery();
+}catch(e){let m=e.reason||e.message||String(e);if(m.includes('execution reverted:'))m=m.split('execution reverted:').pop().trim();toast('Failed: '+m,'err');}
+}
+
+/* ===== TOKEN OPS ===== */
+async function doTransfer(){
+if(!account){toast('Connect wallet','err');return;}
+const to=document.getElementById('xfTo').value.trim(),am=document.getElementById('xfAmt').value.trim();
+if(!ethers.isAddress(to)){toast('Invalid address','err');return;}if(!am||Number(am)<=0){toast('Invalid amount','err');return;}
+const btn=document.getElementById('xfBtn');btn.disabled=true;btn.innerHTML='<span class="spin"></span>';
+try{const v=ethers.parseUnits(am,dec);const tx=await tC.transfer(to,v);toast(`TX: ${s(tx.hash)}`,'inf');await tx.wait();toast('Sent!','ok');loadClaimInfo();
+}catch(e){let m=e.reason||e.message||'';if(m.includes('execution reverted:'))m=m.split('execution reverted:').pop().trim();toast('Failed: '+m,'err');
+}finally{btn.disabled=false;btn.innerHTML='<i class="fa-solid fa-paper-plane" style="margin-right:4px;"></i>Send';}
+}
+async function doApprove(){
+if(!account){toast('Connect wallet','err');return;}
+const sp=document.getElementById('apSp').value.trim(),am=document.getElementById('apAmt').value.trim();
+if(!ethers.isAddress(sp)){toast('Invalid address','err');return;}if(!am||Number(am)<=0){toast('Invalid amount','err');return;}
+const btn=document.getElementById('apBtn');btn.disabled=true;btn.innerHTML='<span class="spin"></span>';
+try{const v=ethers.parseUnits(am,dec);const tx=await tC.approve(sp,v);toast(`TX: ${s(tx.hash)}`,'inf');await tx.wait();toast('Approved!','ok');
+}catch(e){let m=e.reason||e.message||'';if(m.includes('execution reverted:'))m=m.split('execution reverted:').pop().trim();toast('Failed: '+m,'err');
+}finally{btn.disabled=false;btn.innerHTML='<i class="fa-solid fa-check" style="margin-right:4px;"></i>Approve';}
+}
+async function doApproveMax(){
+if(!account){toast('Connect wallet','err');return;}
+const sp=document.getElementById('apSp').value.trim();if(!ethers.isAddress(sp)){toast('Invalid address','err');return;}
+const btn=document.getElementById('apMaxBtn');btn.disabled=true;btn.innerHTML='<span class="spin"></span>';
+try{const tx=await tC.approve(sp,ethers.MaxUint256);toast(`TX: ${s(tx.hash)}`,'inf');await tx.wait();toast('Max approved!','ok');
+}catch(e){let m=e.reason||e.message||'';if(m.includes('execution reverted:'))m=m.split('execution reverted:').pop().trim();toast('Failed: '+m,'err');
+}finally{btn.disabled=false;btn.innerHTML='Max';}
+}
+
+/* ===== API SCANNER ===== */
+async function runApiScan(){
+const base=document.getElementById('apiBase').value.trim().replace(/\/$/,'');
+const addr=document.getElementById('scanAddr').value.trim();if(!addr){toast('Enter address','err');return;}
+const btn=document.getElementById('scanBtn');btn.disabled=true;
+const bar=document.getElementById('scanBar');bar.style.display='block';
+const fill=document.getElementById('scanFill');fill.style.width='0%';
+
+const paths=[`/airdropChallenge?address=${addr}`,`/airdropClaim?address=${addr}`,`/airdropDetail?address=${addr}`,`/airdropProof?address=${addr}`,`/airdropVerify?address=${addr}`,`/claim?address=${addr}`,`/challenge?address=${addr}`,`/proof?address=${addr}`,`/verify?address=${addr}`,`/allocation?address=${addr}`,`/balance?address=${addr}`,`/eligibility?address=${addr}`,`/reward?address=${addr}`,`/vesting?address=${addr}`,`/signature?address=${addr}`,`/info?address=${addr}`,`/user?address=${addr}`,`/status?address=${addr}`,`/status`,`/health`,`/ping`,`/version`,`/`,`/docs`,`/swagger.json`,`/openapi.json`,];
+const bases=[base,base.replace(/\/v\d+\/?$/,'')];
+if(base.replace(/\/v1\/?$/,'/v2')!==base)bases.push(base.replace(/\/v1\/?$/,'/v2'));
+
+const pxs=[{n:'direct',f:u=>u}];
+if(document.getElementById('px1').checked)pxs.push({n:'corsproxy',f:u=>'https://corsproxy.io/?'+encodeURIComponent(u)});
+if(document.getElementById('px2').checked)pxs.push({n:'allorigins',f:u=>'https://api.allorigins.win/raw?url='+encodeURIComponent(u)});
+
+const eps=[];
+for(const b of bases)for(const p of paths)eps.push({m:'GET',url:`${b}${p}`});
+const postPaths=['/airdropClaim','/airdropChallenge','/airdropProof'];
+for(const b of bases)for(const p of postPaths)eps.push({m:'OPTIONS',url:`${b}${p}`});
+
+const total=eps.length*pxs.length;let done=0;let results=[];
+for(const px of pxs){for(const ep of eps){
+try{const fu=px.f(ep.url);const ct2=new AbortController();const t=setTimeout(()=>ct2.abort(),6000);
+let r;if(ep.m==='OPTIONS')r=await fetch(fu,{method:'OPTIONS',signal:ct2.signal});else r=await fetch(fu,{signal:ct2.signal});
+clearTimeout(t);const ct=r.headers.get('content-type')||'';let bd='';try{bd=ct.includes('json')?JSON.stringify(await r.json(),null,2):(await r.text()).slice(0,400);}catch(e){bd='(unreadable)';}
+const co=r.headers.get('access-control-allow-origin')||'none';
+results.push({px:px.n,m:ep.m,url:ep.url,st:r.status,ok:r.ok,cors:co,bd:bd.slice(0,400),ct});
+}catch(e){results.push({px:px.n,m:ep.m,url:ep.url,st:'ERR',ok:false,cors:'—',bd:e.message.slice(0,80),ct:''});}
+done++;fill.style.width=Math.round(done/total*100)+'%';
+}}
+
+const working=results.filter(r=>r.ok);const corsE=results.filter(r=>r.cors!=='none');
+let h=mc('i','fa-chart-bar','Scan Summary',`Total: ${results.length} · Working: <strong style="color:var(--accent);">${working.length}</strong> · CORS-enabled: <strong style="color:${corsE.length>0?'var(--accent)':'var(--danger)'};">${corsE.length}</strong>`,'');
+
+if(corsE.length>0){
+h+=`<div style="font-weight:700;font-size:14px;margin:8px 0;color:var(--accent);">CORS-Enabled Endpoints (use these!)</div>`;
+for(const r of corsE)h+=`<div class="dc dc-ok"><span style="font-weight:600;font-size:12px;color:var(--accent2);">${r.m}</span> <span class="alink" onclick="cp('${r.url}')">${r.url.replace(base,'')}</span> <span style="font-size:10px;color:var(--muted);">via ${r.px}</span></div>`;
+}
+
+if(working.length>0){
+h+=`<details style="margin-top:8px;"><summary style="cursor:pointer;font-weight:700;font-size:13px;color:var(--muted);">Working Endpoints (${working.length})</summary>`;
+for(const r of working)h+=`<div class="dc dc-ok" style="margin-top:6px;"><div style="font-size:11px;font-weight:600;color:var(--accent2);">${r.px} · ${r.m} · ${r.st}</div><div class="alink" style="font-size:10px;" onclick="cp('${r.url}')">${r.url}</div><div class="cb" style="margin-top:4px;">${r.bd.slice(0,300)}</div></div>`;
+h+=`</details>`;
+}
+
+h+=`<details style="margin-top:8px;"><summary style="cursor:pointer;font-weight:700;font-size:13px;color:var(--muted);">All ${results.length} Results</summary><div style="overflow-x:auto;margin-top:6px;"><table class="tbl"><tr><th>Proxy</th><th>M</th><th>Endpoint</th><th>Status</th><th>CORS</th></tr>`;
+for(const r of results){h+=`<tr><td style="font-size:10px;color:var(--muted);">${r.px}</td><td style="font-size:10px;color:var(--accent2);">${r.m}</td><td style="font-size:9px;max-width:180px;" class="alink" onclick="cp('${r.url}')">${r.url.replace(base,'')}</td><td style="color:${r.ok?'var(--accent)':r.st==='ERR'?'var(--danger)':'var(--warning)'};">${r.st}</td><td style="font-size:10px;color:${r.cors!=='none'?'var(--accent)':'var(--danger)'};">${r.cors!=='none'?'YES':'NO'}</td></tr>`;}
+h+=`</table></div></details>`;
+
+document.getElementById('scanRes').style.display='block';
+document.getElementById('scanRes').innerHTML=h;
+btn.disabled=false;bar.style.display='none';fill.style.width='0%';
+toast(`Done: ${working.length} working, ${corsE.length} CORS-enabled`,'ok');
+}
+
+/* ===== BSCSCAN ===== */
+async function scanBsc(){
+const addr=document.getElementById('bscAddr').value.trim();const key=document.getElementById('bscKey').value.trim();
+if(!ethers.isAddress(addr)){toast('Invalid address','err');return;}
+const el=document.getElementById('bscRes');el.style.display='block';
+el.innerHTML='<div class="dc dc-i"><i class="fa-solid fa-spinner fa-spin" style="margin-right:6px;"></i> Querying BscScan...</div>';
+
+if(key){
+try{
+const r=await fetch(`https://api.bscscan.com/api?module=account&action=txlist&address=${addr}&startblock=0&endblock=99999999&sort=asc&apikey=${key}`);
+const d=await r.json();
+if(d.status==='1'&&d.result&&Array.isArray(d.result)){
+const cr=d.result.filter(tx=>tx.contractAddress&&tx.contractAddress!=='');
+let h=mc('ok','fa-check-circle','BscScan Results',`Total txs: ${d.result.length} · Contract creations: <strong style="color:var(--accent);">${cr.length}</strong>`,'');
+if(cr.length){
+h+=`<div style="overflow-x:auto;"><table class="tbl"><tr><th>Contract</th><th>Block</th><th>Action</th></tr>`;
+for(const c of cr)h+=`<tr><td class="alink" onclick="cp('${c.contractAddress}')">${c.contractAddress}</td><td style="font-size:11px;">${c.blockNumber}</td><td><button class="btn-s" onclick="document.getElementById('vAddr').value='${c.contractAddress}';verifyContract();" style="padding:4px 10px;font-size:10px;">Verify</button></td></tr>`;
+h+=`</table></div>`;
+}
+el.innerHTML=h;toast(`Found ${cr.length} contracts`,'ok');return;
+}else{el.innerHTML=mc('w','fa-exclamation-triangle','BscScan: No results',d.message||'Try a different address','');return;}
+}catch(e){el.innerHTML=mc('e','fa-times-circle','API Error',e.message,'');return;}
+}
+el.innerHTML=mc('w','fa-info-circle','No API Key',
+`<a href="https://bscscan.com/address/${addr}" target="_blank" style="color:var(--accent);">Open BscScan manually</a> — look for "Contract Creation" in the Transactions tab.`,
+`Or get a free API key at <a href="https://bscscan.com/register" target="_blank" style="color:var(--accent);">bscscan.com/register</a>`);
+}
+
+/* ===== VERIFY ===== */
+async function verifyContract(){
+if(!ethL||!account){toast('Connect wallet','err');return;}
+const addr=document.getElementById('vAddr').value.trim();if(!ethers.isAddress(addr)){toast('Enter address','err');return;}
+const btn=document.getElementById('vBtn');btn.disabled=true;btn.innerHTML='<span class="spin" style="margin-right:6px;"></span>Verifying...';
+const el=document.getElementById('vRes');el.style.display='block';
+
+try{
+const c=new ethers.Contract(addr,AD_ABI,provider);
+const tO=await (new ethers.Contract(T_ADDR,T_ABI,provider)).owner();
+const[adT,adV,adO,adD]=await Promise.all([c.getToken().catch(e=>({e:e.reason||e.message})),c.onVestingMain().catch(e=>({e:e.reason||e.message})),c.owner().catch(e=>({e:e.reason||e.message})),c.getAirdropDetail(account).catch(e=>({e:e.reason||e.message}))]);
+
+const ch=[];
+ch.push({ok:!adT.e,lb:'getToken()',v:adT.e?'Missing':'PASS — '+s(adT),n:adT.e?'Function not found':(adT.toLowerCase()===T_ADDR.toLowerCase()?'Matches ONToken!':'Wrong token')});
+ch.push({ok:!adV.e,lb:'onVestingMain()',v:adV.e?'Missing':'PASS — '+s(adV),n:adV.e?'Function not found':(adV.toLowerCase()===tO.toLowerCase()?'Matches!':'Mismatch')});
+ch.push({ok:!adO.e,lb:'owner()',v:adO.e?'Missing':adO,n:''});
+ch.push({ok:!adD.e,lb:'getAirdropDetail()',v:adD.e?'Missing':`Nonce: ${adD.nonce}, Redeemed: ${fN(ethers.formatUnits(adD.redeemed,dec))}`,n:adD.e?'May not be ONAirdrop':'Function works!'});
+
+const pass=ch.filter(c2=>c2.ok).length;
+const verdict=pass>=3&&ch[0].ok&&ch[3].ok;
+
+let h='';
+if(verdict){h+=mc('ok','fa-check-double','This IS the ONAirdrop Contract!',`Address: <span class="alink" onclick="cp('${addr}')">${addr}</span>`,`${pass}/4 checks passed. Use this for claiming.`);}
+else if(pass>=2){h+=mc('w','fa-exclamation-triangle','Possibly ONAirdrop',`${pass}/4 passed. Some functions matched.`,'Verify on BscScan Read Contract.');}
+else{h+=mc('e','fa-times-circle','Probably NOT ONAirdrop',`${pass}/4 passed.`,'');}
+
+for(const c2 of ch){const t=c2.ok?'dc-ok':'dc-e';const ic=c2.ok?'var(--accent)':'var(--danger)';
+h+=`<div class="dc ${t}"><div style="font-weight:700;font-size:13px;color:${ic};">${c2.lb}</div><div style="font-size:12px;">${c2.v}</div>${c2.n?`<div style="font-size:11px;color:var(--muted);margin-top:2px;">${c2.n}</div>`:''}</div>`;}
+
+el.innerHTML=h;
+}catch(e){el.innerHTML=mc('e','fa-times-circle','Error',(e.reason||e.message||'').slice(0,300),'');
+}finally{btn.disabled=false;btn.innerHTML='<i class="fa-solid fa-check-double" style="margin-right:6px;"></i>Verify';}
+}
+
+/* ===== ETHERS LOADER ===== */
+(function(){const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js';
+s.onload=()=>{ethL=true;ethR();console.log('ethers loaded');
+const ws=gWP();(async()=>{for(const w of ws){try{const a=await w.p.request({method:'eth_accounts'});if(a&&a.length){await cw(w.id);return;}}catch(e){}}})();};
+s.onerror=()=>toast('ethers.js failed to load','err');
+document.head.appendChild(s);})();
+</script>
+</body>
+</html>
