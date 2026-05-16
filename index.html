@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Orochi Network — Contract Discovery & Claim</title>
+<title>Orochi Network — API & Contract Scanner</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -12,12 +12,12 @@
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--fg);min-height:100vh;overflow-x:hidden;}
 .bg-fx{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
-.bg-fx .orb{position:absolute;border-radius:50%;filter:blur(150px);opacity:.07;animation:drift 26s ease-in-out infinite alternate;}
+.bg-fx .orb{position:absolute;border-radius:50%;filter:blur(150px);opacity:.06;animation:drift 26s ease-in-out infinite alternate;}
 .bg-fx .orb:nth-child(1){width:600px;height:600px;background:var(--accent);top:-250px;left:-150px;animation-duration:30s;}
 .bg-fx .orb:nth-child(2){width:450px;height:450px;background:var(--accent2);bottom:-180px;right:-80px;animation-duration:34s;animation-delay:-8s;}
 @keyframes drift{0%{transform:translate(0,0) scale(1);}50%{transform:translate(50px,-30px) scale(1.06);}100%{transform:translate(-20px,20px) scale(.97)};}
 .wrap{position:relative;z-index:1;}
-.g{background:var(--card);border:1px solid var(--border);border-radius:16px;backdrop-filter:blur(20px);transition:border-color .3s;}
+.g{background:var(--card);border:1px solid var(--border);border-radius:16px;backdrop-filter:blur(20px);}
 .inp{background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--fg);font-family:'JetBrains Mono',monospace;font-size:12px;width:100%;transition:all .25s;outline:none;}
 .inp:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,232,157,.08);}
 .btn-s{background:transparent;color:var(--accent);font-weight:600;border:1.5px solid rgba(0,232,157,.3);border-radius:10px;padding:10px 20px;cursor:pointer;transition:all .25s;font-family:'Space Grotesk',sans-serif;font-size:14px;}
@@ -36,7 +36,6 @@ body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--fg)
 @keyframes tIn{from{transform:translateX(100px);opacity:0;}to{transform:translateX(0);opacity:1;}}
 @keyframes tOut{from{opacity:1;}to{opacity:0;transform:translateY(-10px);}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
-@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.5;}}
 .spin{width:18px;height:18px;border:2.5px solid transparent;border-top-color:currentColor;border-radius:50%;animation:sp .6s linear infinite;display:inline-block;vertical-align:middle;}
 @keyframes sp{to{transform:rotate(360deg);}}
 .dc{border-radius:12px;padding:14px;border:1px solid;animation:fadeUp .35s ease;margin-bottom:10px;}
@@ -50,39 +49,34 @@ body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--fg)
 .dc-e .di{background:rgba(255,77,106,.15);color:var(--danger);}
 .dc-i .di{background:rgba(0,201,255,.15);color:var(--accent2);}
 .cb{background:#080910;border:1px solid var(--border);border-radius:8px;padding:12px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent);overflow-x:auto;white-space:pre-wrap;word-break:break-all;line-height:1.5;max-height:200px;overflow-y:auto;}
+.tbl{width:100%;border-collapse:collapse;font-size:12px;}
+.tbl th{text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;}
+.tbl td{padding:8px 10px;border-bottom:1px solid rgba(26,30,53,.5);vertical-align:top;word-break:break-all;}
 .wo{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:12px;cursor:pointer;border:1.5px solid var(--border);transition:all .25s;background:var(--card);margin-bottom:10px;}
 .wo:hover{border-color:var(--accent);background:rgba(0,232,157,.04);transform:translateX(4px);}
 .wo .wi{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
 .mo{position:fixed;inset:0;z-index:9990;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;}
 .mb{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:28px;max-width:400px;width:90%;animation:slideUp .3s ease;}
-@keyframes slideUp{from{transform:translateY(30px);opacity:0;}to{transform:translateY(0);opacity:1;}}
-.tbl{width:100%;border-collapse:collapse;font-size:12px;}
-.tbl th{text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;}
-.tbl td{padding:8px 10px;border-bottom:1px solid rgba(26,30,53,.5);vertical-align:top;}
-.tbl tr:hover td{background:rgba(0,232,157,.02);}
-.sb{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;font-weight:700;font-size:10px;flex-shrink:0;}
-.sb-d{background:rgba(0,232,157,.15);color:var(--accent);border:1.5px solid rgba(0,232,157,.4);}
-.sb-a{background:rgba(0,201,255,.1);color:var(--accent2);border:1.5px solid rgba(0,201,255,.4);animation:pulse 2s ease-in-out infinite;}
-.sb-p{background:var(--bg2);color:var(--muted);border:1.5px solid var(--border);}
-.timer-ok{color:var(--accent);}.timer-w{color:var(--warning);}.timer-d{color:var(--danger);animation:pulse .8s ease-in-out infinite;}
-.chain-line{position:relative;padding-left:36px;margin-left:16px;border-left:2px solid var(--border);}
-.chain-dot{position:absolute;left:-7px;top:4px;width:12px;height:12px;border-radius:50%;border:2px solid var(--border);background:var(--bg2);}
-.chain-dot.found{border-color:var(--accent);background:var(--accent);}
-.chain-dot.searching{border-color:var(--accent2);background:rgba(0,201,255,.3);box-shadow:0 0 8px rgba(0,201,255,.4);}
-.chain-dot.missing{border-color:var(--danger);background:rgba(255,77,106,.3);}
+@keyframes slideUp{from{transform:translateY(30px);opacity:0;}to{transform:translateY(0);opacity:1);}}
+.progress-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:8px;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;transition:width .3s;}
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:.5px;}
+.tag-ok{background:rgba(0,232,157,.15);color:var(--accent);border:1px solid rgba(0,232,157,.3);}
+.tag-err{background:rgba(255,77,106,.15);color:var(--danger);border:1px solid rgba(255,77,106,.3);}
+.tag-warn{background:rgba(255,184,77,.15);color:var(--warning);border:1px solid rgba(255,184,77,.3);}
+.tag-info{background:rgba(0,201,255,.15);color:var(--accent2);border:1px solid rgba(0,201,255,.3);}
 </style>
 </head>
 <body>
 <div class="bg-fx"><div class="orb"></div><div class="orb"></div></div>
 <div class="toast-box" id="toasts"></div>
 <div id="wm" style="display:none;"></div>
-
 <div class="wrap">
 <header style="position:sticky;top:0;z-index:50;background:rgba(6,7,11,.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
     <div class="flex items-center gap-3">
       <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#06070b;">ON</div>
-      <div><div class="font-bold" style="line-height:1.1;">Orochi Network</div><div style="font-size:10px;color:var(--muted);letter-spacing:1.5px;">CONTRACT DISCOVERY & CLAIM</div></div>
+      <div><div class="font-bold" style="line-height:1.1;">Orochi Network</div><div style="font-size:10px;color:var(--muted);letter-spacing:1.5px;">API & CONTRACT SCANNER</div></div>
     </div>
     <div class="flex items-center gap-3">
       <div id="sB" style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:16px;font-size:11px;font-weight:600;background:rgba(255,77,106,.1);color:var(--danger);border:1px solid rgba(255,77,106,.25);"><span style="width:5px;height:5px;border-radius:50%;background:var(--danger);"></span><span id="sT">Disconnected</span></div>
@@ -93,112 +87,142 @@ body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--fg)
 
 <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8">
 
-<!-- CONTRACT CHAIN -->
-<section style="margin-bottom:32px;">
-  <h1 style="font-size:28px;font-weight:800;line-height:1.1;margin-bottom:6px;">Contract Discovery</h1>
-  <p style="color:var(--muted);font-size:14px;margin-bottom:20px;">Starting from the Token contract, discover the entire Orochi Network contract tree on-chain.</p>
+<!-- SECTION 1: HOW TO DISCOVER -->
+<section class="mb-8">
+  <h1 style="font-size:28px;font-weight:800;margin-bottom:6px;">How to Find the Real API Endpoints</h1>
+  <p style="color:var(--muted);font-size:14px;margin-bottom:20px;">The API blocks direct browser requests (CORS). Here are 3 methods to discover the real endpoints.</p>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div class="g p-5" style="border-radius:16px;border-top:3px solid var(--accent);">
+      <div style="font-weight:700;font-size:15px;margin-bottom:6px;"><i class="fa-solid fa-magnifying-glass" style="color:var(--accent);margin-right:4px;"></i> Method 1</div>
+      <div style="font-weight:700;margin-bottom:4px;">Network Tab</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.5;">
+        Go to <strong style="color:var(--fg);">tge.orochi.network</strong> → Press <strong style="color:var(--fg);">F12</strong> → Click <strong style="color:var(--fg);">Network</strong> tab → Connect wallet → Click Claim. Watch the API calls appear in real-time.
+      </div>
+    </div>
+    <div class="g p-5" style="border-radius:16px;border-top:3px solid var(--accent2);">
+      <div style="font-weight:700;font-size:15px;margin-bottom:6px;"><i class="fa-solid fa-code" style="color:var(--accent2);margin-right:4px;"></i> Method 2</div>
+      <div style="font-weight:700;margin-bottom:4px;">Source Code</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.5;">
+        View page source (<strong style="color:var(--fg);">Ctrl+U</strong>) or check the <strong style="color:var(--fg);">.js</strong> files for <code style="color:var(--accent);">fetch()</code> or <code style="color:var(--accent);">axios</code> calls. Search for <code style="color:var(--accent);">/api/</code> in the JS bundles.
+      </div>
+    </div>
+    <div class="g p-5" style="border-radius:16px;border-top:3px solid var(--warning);">
+      <div style="font-weight:700;font-size:15px;margin-bottom:6px;"><i class="fa-solid fa-server" style="color:var(--warning);margin-right:4px;"></i> Method 3</div>
+      <div style="font-weight:700;margin-bottom:4px;">BscScan Contract</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.5;">
+        Find the airdrop contract from the creator address on BscScan. Read its bytecode or check its transactions for clues about API integration.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 2: API ENDPOINT SCANNER -->
+<section class="mb-8">
+  <h2 style="font-size:22px;font-weight:800;margin-bottom:4px;">API Endpoint Scanner</h2>
+  <p style="color:var(--muted);font-size:14px;margin-bottom:16px;">Tests 50+ endpoints using direct fetch AND CORS proxies to bypass browser restrictions.</p>
 
   <div class="g p-5 mb-5">
-    <div style="font-size:13px;font-weight:700;margin-bottom:10px;"><i class="fa-solid fa-satellite-dish" style="color:var(--accent);margin-right:6px;"></i>Starting Point</div>
-    <div style="font-size:11px;color:var(--muted);margin-bottom:3px;">ONToken Contract</div>
-    <div class="alink" style="font-size:12px;margin-bottom:12px;" onclick="cp('0x33f6BE84becfF45ea6aA2952d7eF890B44bFB59d')">0x33f6BE84becfF45ea6aA2952d7eF890B44bFB59d</div>
-    <div style="margin-bottom:14px;">
-      <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">Airdrop Contract (if known — optional)</label>
-      <input class="inp" id="airdropInput" placeholder="0x... leave blank to auto-discover from VestingMain"/>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+      <div>
+        <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">API Base URL</label>
+        <input class="inp" id="apiBase" value="https://tge.orochi.network/api/v1"/>
+      </div>
+      <div>
+        <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">Your Address</label>
+        <input class="inp" id="scanAddr" placeholder="0x..." value=""/>
+      </div>
+    </div>
+    <div style="margin-bottom:12px;">
+      <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:6px;">CORS Proxy (select one or multiple)</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;"><input type="checkbox" id="pxy0" checked/> None (direct)</label>
+        <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;"><input type="checkbox" id="pxy1" checked/> corsproxy.io</label>
+        <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;"><input type="checkbox" id="pxy2"/> allorigins</label>
+        <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;"><input type="checkbox" id="pxy3"/> cors-anywhere (demo)</label>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+      <button class="btn-big" id="scanBtn" onclick="runApiScan()"><i class="fa-solid fa-radar" style="margin-right:6px;"></i>Scan All Endpoints</button>
+      <span id="scanProgress" style="font-size:12px;color:var(--muted);display:none;"><span class="spin"></span> Scanning...</span>
+    </div>
+    <div class="progress-bar" id="scanBar" style="display:none;"><div class="progress-fill" id="scanFill" style="width:0%;"></div></div>
+  </div>
+
+  <div id="scanResults" style="display:none;"></div>
+</section>
+
+<!-- SECTION 3: BSCSCAN CONTRACT DISCOVERY -->
+<section class="mb-8">
+  <h2 style="font-size:22px;font-weight:800;margin-bottom:4px;">BscScan Contract Discovery</h2>
+  <p style="color:var(--muted);font-size:14px;margin-bottom:16px;">Find all contracts created by the deployer address using BscScan API.</p>
+
+  <div class="g p-5 mb-5">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+      <div>
+        <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">Creator/Deployer Address</label>
+        <input class="inp" id="creatorAddr" value="0x3cd986F0756cf2c1a401487222c177FF963f27a0"/>
+      </div>
+      <div>
+        <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">BscScan API Key (free at bscscan.com)</label>
+        <input class="inp" id="bscKey" placeholder="Your free API key" type="password"/>
+      </div>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
-      <button class="btn-big" id="discBtn" onclick="runDiscovery()" disabled><i class="fa-solid fa-satellite-dish" style="margin-right:6px;"></i>Discover All Contracts</button>
-      <button class="btn-s" onclick="owm()">Connect Wallet</button>
+      <button class="btn-big" onclick="scanBscScan()"><i class="fa-solid fa-magnifying-glass" style="margin-right:6px;"></i>Find Contracts on BscScan</button>
+      <a href="https://bscscan.com/address/0x3cd986F0756cf2c1a401487222c177FF963f27a0" target="_blank" class="btn-s" style="text-decoration:none;padding:12px 20px;">Open on BscScan</a>
     </div>
   </div>
 
-  <!-- Discovery chain visualization -->
-  <div id="chainVis" style="display:none;margin-bottom:20px;">
-    <div style="font-size:13px;font-weight:700;margin-bottom:12px;">Contract Tree</div>
-    <div id="chainNodes"></div>
-  </div>
-
-  <div id="discResults" style="display:none;"></div>
+  <div id="bscResults" style="display:none;"></div>
 </section>
 
-<!-- YOUR VESTING -->
-<section id="vestSection" style="display:none;margin-bottom:32px;">
-  <h2 style="font-size:22px;font-weight:800;margin-bottom:16px;">Your Vesting Schedules</h2>
-  <div id="vestResults"></div>
-</section>
+<!-- SECTION 4: CONTRACT VERIFIER -->
+<section class="mb-8">
+  <h2 style="font-size:22px;font-weight:800;margin-bottom:4px;">Airdrop Contract Verifier</h2>
+  <p style="color:var(--muted);font-size:14px;margin-bottom:16px;">If you found a candidate contract, verify it's the real ONAirdrop by checking on-chain data.</p>
 
-<!-- AIRDROP CLAIM -->
-<section id="claimSection" style="margin-bottom:32px;">
-  <h2 style="font-size:22px;font-weight:800;margin-bottom:6px;">Claim Tokens</h2>
-  <p style="color:var(--muted);font-size:14px;margin-bottom:16px;">Two claim paths: Vesting (direct, no proof) and Airdrop (challenge-response API).</p>
-
-  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;">
-    <div style="display:flex;align-items:center;gap:4px;"><div class="sb sb-p" id="cb1">1</div><span style="font-size:11px;font-weight:600;" id="ct1">Connect</span></div>
-    <i class="fa-solid fa-arrow-right" style="color:var(--border);font-size:9px;align-self:center;"></i>
-    <div style="display:flex;align-items:center;gap:4px;"><div class="sb sb-p" id="cb2">2</div><span style="font-size:11px;font-weight:600;" id="ct2">Challenge</span></div>
-    <i class="fa-solid fa-arrow-right" style="color:var(--border);font-size:9px;align-self:center;"></i>
-    <div style="display:flex;align-items:center;gap:4px;"><div class="sb sb-p" id="cb3">3</div><span style="font-size:11px;font-weight:600;" id="ct3">Sign</span></div>
-    <i class="fa-solid fa-arrow-right" style="color:var(--border);font-size:9px;align-self:center;"></i>
-    <div style="display:flex;align-items:center;gap:4px;"><div class="sb sb-p" id="cb4">4</div><span style="font-size:11px;font-weight:600;" id="ct4">Proof</span></div>
-    <i class="fa-solid fa-arrow-right" style="color:var(--border);font-size:9px;align-self:center;"></i>
-    <div style="display:flex;align-items:center;gap:4px;"><div class="sb sb-p" id="cb5">5</div><span style="font-size:11px;font-weight:600;" id="ct5">Claim</span></div>
+  <div class="g p-5 mb-5">
+    <div style="margin-bottom:12px;">
+      <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">Candidate Airdrop Contract Address</label>
+      <input class="inp" id="verifyAddr" placeholder="0x... candidate address"/>
+    </div>
+    <button class="btn-big" id="verifyBtn" onclick="verifyAirdrop()" disabled><i class="fa-solid fa-check-double" style="margin-right:6px;"></i>Verify Contract</button>
   </div>
 
-  <div id="claimStatus" style="display:none;margin-bottom:16px;"></div>
-  <div id="timerArea" style="display:none;margin-bottom:16px;"></div>
-  <div id="apiLog" style="display:none;margin-bottom:16px;"></div>
-
-  <div style="display:flex;gap:12px;flex-wrap:wrap;">
-    <button class="btn-big" id="claimBtn" onclick="oneClickClaim()" disabled><i class="fa-solid fa-parachute-box" style="margin-right:6px;"></i>One-Click Airdrop Claim</button>
-  </div>
+  <div id="verifyResults" style="display:none;"></div>
 </section>
 
-<!-- API EXPLORER -->
-<section style="margin-bottom:32px;">
-  <h2 style="font-size:18px;font-weight:800;margin-bottom:12px;">API Explorer</h2>
-  <div class="g p-5">
-    <button class="btn-s" onclick="exploreApi()" style="font-size:12px;padding:8px 16px;"><i class="fa-solid fa-flask" style="margin-right:4px;"></i>Test All API Endpoints</button>
-    <div id="apiExploreResults" style="display:none;margin-top:12px;"></div>
+<!-- SECTION 5: INSTRUCTIONS -->
+<section class="mb-8">
+  <h2 style="font-size:18px;font-weight:800;margin-bottom:12px;">Step-by-Step: Find Endpoints from Official Page</h2>
+  <div class="g p-5" style="border-radius:16px;">
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div style="display:flex;gap:10px;"><div style="width:24px;height:24px;border-radius:50%;background:rgba(0,232,157,.15);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;flex-shrink:0;">1</div><div style="font-size:13px;line-height:1.5;">Open <strong style="color:var(--fg);">tge.orochi.network</strong> in Chrome/Brave</div></div>
+      <div style="display:flex;gap:10px;"><div style="width:24px;height:24px;border-radius:50%;background:rgba(0,232,157,.15);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;flex-shrink:0;">2</div><div style="font-size:13px;line-height:1.5;">Press <strong style="color:var(--fg);">F12</strong> → Click <strong style="color:var(--fg);">Network</strong> tab</div></div>
+      <div style="display:flex;gap:10px;"><div style="width:24px;height:24px;border-radius:50%;background:rgba(0,232,157,.15);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;flex-shrink:0;">3</div><div style="font-size:13px;line-height:1.5;">Connect your wallet on the page</div></div>
+      <div style="display:flex;gap:10px;"><div style="width:24px;height:24px;border-radius:50%;background:rgba(0,232,157,.15);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;flex-shrink:0;">4</div><div style="font-size:13px;line-height:1.5;">Click the <strong style="color:var(--fg);">"Claim"</strong> button</div></div>
+      <div style="display:flex;gap:10px;"><div style="width:24px;height:24px;border-radius:50%;background:rgba(0,232,157,.15);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;flex-shrink:0;">5</div><div style="font-size:13px;line-height:1.5;">Look at Network tab — you'll see the API calls. Click each one to see the <strong style="color:var(--fg);">URL, Method, Headers, Payload, and Response</strong></div></div>
+      <div style="display:flex;gap:10px;"><div style="width:24px;height:24px;border-radius:50%;background:rgba(255,184,77,.15);color:var(--warning);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;flex-shrink:0;">!</div><div style="font-size:13px;line-height:1.5;color:var(--warning);">The API calls happen from the <strong>page's backend or JS</strong>, so they bypass CORS. Your browser can't make the same calls directly unless you use a CORS proxy.</div></div>
+    </div>
   </div>
 </section>
 
 </main>
 <footer style="border-top:1px solid var(--border);background:var(--bg2);">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4" style="font-size:11px;color:var(--muted);">Orochi Network Contract Discovery & Claim Tool</div>
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4" style="font-size:11px;color:var(--muted);">Orochi Network API & Contract Scanner</div>
 </footer>
 </div>
 
 <script>
 // =====================================================================
-// CONFIG — Token contract as the entry point
-// =====================================================================
-const TOKEN_ADDR='0x33f6BE84becfF45ea6aA2952d7eF890B44bFB59d';
-const API_BASE='https://tge.orochi.network/api/v1';
-const PROOF_EXPIRY=300;
-
-const TOKEN_ABI=["function name() view returns(string)","function symbol() view returns(string)","function decimals() view returns(uint8)","function totalSupply() view returns(uint256)","function balanceOf(address) view returns(uint256)","function owner() view returns(address)"];
-const AIRDROP_ABI=["function claim(bytes calldata, tuple(uint256 amount, uint256 nonce, uint64 timestamp) calldata) external","function getAirdropDetail(address) view returns(tuple(uint256 nonce, uint256 redeemed, uint256 timestamp))","function isOperator(address) view returns(bool)","function getToken() view returns(address)","function onVestingMain() view returns(address)","function owner() view returns(address)"];
-const VESTING_MAIN_ABI=["function isTGE() view returns(bool)","function getTimeTGE() view returns(uint256)","function getTokenAddress() view returns(address)","function getImplementation() view returns(address)","function getVestingContractTotal() view returns(uint256)","function getVestingContractAddress(uint256) view returns(address)","function getVestingDetailList(uint256,uint256) view returns(tuple(address contractAddress, address beneficiary, uint64 start, uint64 end, uint64 milestoneDuration, uint64 milestoneClaimed, uint256 milestoneReleaseAmount, uint256 unlockedAtTGE, uint256 totalClaimed, uint256 balanceClaimable, uint256 balanceRemain)[])","function owner() view returns(address)"];
-const VESTING_SUB_ABI=["function getBeneficiary() view returns(address)","function getClaimableBalance() view returns(uint256)","function getRemainingBalance() view returns(uint256)","function getVestingDetail() view returns(tuple(address contractAddress, address beneficiary, uint64 start, uint64 end, uint64 milestoneDuration, uint64 milestoneClaimed, uint256 milestoneReleaseAmount, uint256 unlockedAtTGE, uint256 totalClaimed, uint256 balanceRemain))","function claim() external"];
-
-// =====================================================================
 // STATE
 // =====================================================================
-let provider,signer,tokenC,account=null,dec=18,sym='ON';
-let ethersLoaded=false,ethersResolve;
+let provider,signer,account=null,ethersLoaded=false,ethersResolve;
 const ethersReady=new Promise(r=>{ethersResolve=r;});
-let pTimer=null;
-
-// Discovered data
-let disc={
-  token:{addr:TOKEN_ADDR,owner:null,name:'',symbol:'',decimals:18,totalSupply:'0',balance:'0'},
-  vestingMain:{addr:null,isTGE:false,tgeTime:null,tokenAddr:null,impl:null,totalSubs:0,owner:null},
-  airdrop:{addr:null,tokenAddr:null,vestingMainAddr:null,owner:null,detail:null},
-  vestingSubs:[],
-  myVestingSubs:[],
-  network:null,blockNum:0,blockTime:0
-};
-let curChallenge=null,curSig=null,curProof=null,curPayload=null;
+const TOKEN_ADDR='0x33f6BE84becfF45ea6aA2952d7eF890B44bFB59d';
+const TOKEN_ABI=["function name() view returns(string)","function symbol() view returns(string)","function decimals() view returns(uint8)","function owner() view returns(address)"];
+const AIRDROP_ABI=["function claim(bytes calldata,tuple(uint256 amount,uint256 nonce,uint64 timestamp) calldata) external","function getAirdropDetail(address) view returns(tuple(uint256 nonce,uint256 redeemed,uint256 timestamp))","function isOperator(address) view returns(bool)","function getToken() view returns(address)","function onVestingMain() view returns(address)","function owner() view returns(address)"];
 
 // =====================================================================
 // UTILS
@@ -207,21 +231,22 @@ function toast(m,t='inf'){const c=document.getElementById('toasts'),e=document.c
 function cp(t){navigator.clipboard.writeText(t).then(()=>toast('Copied!','ok'));}
 function s(a){return a?a.slice(0,6)+'...'+a.slice(-4):'—';}
 function fN(s){const n=parseFloat(s);if(isNaN(n))return s;if(n>=1e9)return(n/1e9).toFixed(2)+'B';if(n>=1e6)return(n/1e6).toFixed(2)+'M';if(n>=1e3)return(n/1e3).toFixed(2)+'K';return n.toLocaleString(undefined,{maximumFractionDigits:4});}
-function nN(id){const m={1:'Ethereum',56:'BSC',137:'Polygon',43114:'Avalanche',42161:'Arbitrum',10:'Optimism',8453:'Base',11155111:'Sepolia'};return m[id]||`Chain ${id}`;}
-function waitForEthers(){return ethersReady;}
-function setCS(cur){for(let i=1;i<=5;i++){const b=document.getElementById(`cb${i}`),t=document.getElementById(`ct${i}`);b.className='sb '+(i<cur?'sb-d':i===cur?'sb-a':'sb-p');if(i<cur)b.innerHTML='<i class="fa-solid fa-check" style="font-size:8px;"></i>';else b.textContent=i;t.style.color=i<cur?'var(--accent)':i===cur?'var(--accent2)':'var(--muted)';}}
 
-function makeCard(type,icon,title,detail,extra){
-  const c=type==='ok'?'dc-ok':type==='e'?'dc-e':type==='w'?'dc-w':'dc-i';
-  const ic=type==='ok'?'var(--accent)':type==='e'?'var(--danger)':type==='w'?'var(--warning)':'var(--accent2)';
-  return`<div class="dc ${c}"><div style="display:flex;gap:10px;align-items:flex-start;"><div class="di"><i class="fa-solid ${icon}"></i></div><div style="flex:1;min-width:0;"><div style="font-weight:700;font-size:14px;color:${ic};">${title}</div><div style="font-size:12px;color:var(--fg);margin-top:2px;word-break:break-all;">${detail}</div>${extra?`<div style="font-size:11px;color:var(--muted);margin-top:4px;">${extra}</div>`:''}</div></div></div>`;
-}
+// CORS Proxy helpers
+const PROXIES=[
+  {name:'direct',fn:u=>u},
+  {name:'corsproxy.io',fn:u=>`https://corsproxy.io/?${encodeURIComponent(u)}`},
+  {name:'allorigins',fn:u=>`https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`},
+  {name:'cors-anywhere',fn:u=>`https://cors-anywhere.herokuapp.com/${u}`},
+];
 
-function chainNode(label,addr,status,info){
-  const dotClass=status==='found'?'found':status==='searching'?'searching':status==='missing'?'missing':'';
-  const addrHtml=addr?`<div class="alink" style="font-size:11px;" onclick="cp('${addr}')">${addr}</div>`:'';
-  const infoHtml=info?`<div style="font-size:11px;color:var(--muted);margin-top:2px;">${info}</div>`:'';
-  return`<div class="chain-line"><div class="chain-dot ${dotClass}"></div><div style="padding-bottom:14px;"><div style="font-weight:700;font-size:13px;color:${status==='found'?'var(--accent)':status==='searching'?'var(--accent2)':status==='missing'?'var(--danger)':'var(--muted)'};">${label}</div>${addrHtml}${infoHtml}</div></div>`;
+function getSelectedProxies(){
+  const sel=[];
+  if(document.getElementById('pxy0').checked)sel.push(PROXIES[0]);
+  if(document.getElementById('pxy1').checked)sel.push(PROXIES[1]);
+  if(document.getElementById('pxy2').checked)sel.push(PROXIES[2]);
+  if(document.getElementById('pxy3').checked)sel.push(PROXIES[3]);
+  return sel.length?sel:[PROXIES[0]];
 }
 
 // =====================================================================
@@ -229,413 +254,475 @@ function chainNode(label,addr,status,info){
 // =====================================================================
 function gWP(){const w=[];if(window.okxwallet)w.push({id:'okx',n:'OKX',p:window.okxwallet});if(window.ethereum&&window.ethereum.isMetaMask)w.push({id:'mm',n:'MetaMask',p:window.ethereum});if(window.ethereum&&!window.ethereum.isMetaMask&&!window.okxwallet)w.push({id:'inj',n:'Browser',p:window.ethereum});if(window.ethereum&&w.length===0)w.push({id:'inj',n:'Browser',p:window.ethereum});return w;}
 function owm(){const ws=gWP(),m=document.getElementById('wm');const hm=ws.find(w=>w.id==='mm'),ho=ws.find(w=>w.id==='okx');let h='';
-h+=`<div class="wo ${ho?'':'disabled'}" onclick="${ho?"cw('okx')":"void(0)"}"><div class="wi" style="background:#000;border:1px solid #333;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#000" stroke="#fff" stroke-width="1.5"/><path d="M7 8h4v4H7V8zm6 0h4v4h-4V8zm-6 6h4v4H7v-4zm6 0h4v4h-4v-4z" fill="#fff"/></svg></div><div><div style="font-weight:700;font-size:15px;">OKX ${ho?'<span style="color:var(--accent);font-size:11px;">DETECTED</span>':'<span style="color:var(--muted);font-size:11px;">NOT FOUND</span>'}</div></div></div>`;
-h+=`<div class="wo ${hm?'':'disabled'}" onclick="${hm?"cw('mm')":"void(0)"}"><div class="wi" style="background:#f6851b;"><i class="fa-solid fa-mask" style="color:#fff;"></i></div><div><div style="font-weight:700;font-size:15px;">MetaMask ${hm?'<span style="color:var(--accent);font-size:11px;">DETECTED</span>':'<span style="color:var(--muted);font-size:11px;">NOT FOUND</span>'}</div></div></div>`;
-if(!ws.length)h='<div style="text-align:center;padding:20px;color:var(--muted);">No wallet detected.</div>';
+h+=`<div class="wo ${ho?'':'disabled'}" onclick="${ho?"cw('okx')":"void(0)"}"><div class="wi" style="background:#000;border:1px solid #333;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#000" stroke="#fff" stroke-width="1.5"/><path d="M7 8h4v4H7V8zm6 0h4v4h-4V8zm-6 6h4v4H7v-4zm6 0h4v4h-4v-4z" fill="#fff"/></svg></div><div style="font-weight:700;">OKX ${ho?'<span style="color:var(--accent);font-size:11px;">DETECTED</span>':'<span style="color:var(--muted);font-size:11px;">NOT FOUND</span>'}</div></div>`;
+h+=`<div class="wo ${hm?'':'disabled'}" onclick="${hm?"cw('mm')":"void(0)"}"><div class="wi" style="background:#f6851b;"><i class="fa-solid fa-mask" style="color:#fff;"></i></div><div style="font-weight:700;">MetaMask ${hm?'<span style="color:var(--accent);font-size:11px;">DETECTED</span>':'<span style="color:var(--muted);font-size:11px;">NOT FOUND</span>'}</div></div>`;
+if(!ws.length)h='<div style="text-align:center;padding:20px;color:var(--muted);">No wallet.</div>';
 m.innerHTML=`<div class="mo" onclick="cwm(event)"><div class="mb" onclick="event.stopPropagation()"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;"><div style="font-size:18px;font-weight:700;">Connect Wallet</div><button onclick="cwm()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;"><i class="fa-solid fa-xmark"></i></button></div>${h}</div></div>`;m.style.display='block';}
 function cwm(e){if(e&&e.target!==e.currentTarget)return;document.getElementById('wm').style.display='none';}
 
 async function cw(id){
-  const ws=gWP(),w=ws.find(x=>x.id===id);if(!w){toast('Wallet not found','err');return;}
+  const ws=gWP(),w=ws.find(x=>x.id===id);if(!w){toast('Not found','err');return;}
   document.getElementById('wm').style.display='none';
   if(!ethersLoaded){toast('Loading ethers.js...','inf');await waitForEthers();}
   const nb=document.getElementById('nc');nb.disabled=true;nb.innerHTML='<span class="spin"></span>';
   try{
     provider=new ethers.BrowserProvider(w.p,'any');
     const a=await provider.send('eth_requestAccounts',[]);signer=await provider.getSigner();account=a[0];
-    tokenC=new ethers.Contract(TOKEN_ADDR,TOKEN_ABI,signer);
     const bg=document.getElementById('sB');bg.style.cssText='display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:16px;font-size:11px;font-weight:600;background:rgba(0,232,157,.1);color:var(--accent);border:1px solid rgba(0,232,157,.25);';bg.querySelector('span:first-child').style.background='var(--accent)';
     document.getElementById('sT').textContent=s(account);nb.innerHTML=`<i class="fa-solid fa-wallet" style="margin-right:4px;"></i>${s(account)}`;nb.disabled=false;
-    document.getElementById('discBtn').disabled=false;document.getElementById('claimBtn').disabled=false;
-    setCS(2);toast(`Connected via ${w.n}`,'ok');
+    document.getElementById('scanAddr').value=account;
+    document.getElementById('verifyBtn').disabled=false;
+    toast(`Connected: ${s(account)}`,'ok');
     w.p.on('accountsChanged',async(a)=>{if(!a.length){account=null;return;}account=a[0];});
     w.p.on('chainChanged',()=>location.reload());
   }catch(e){console.error(e);toast('Failed: '+(e.reason||e.message||e),'err');nb.innerHTML='Connect';nb.disabled=false;}
 }
 
 // =====================================================================
-// DISCOVERY
+// API ENDPOINT SCANNER
 // =====================================================================
-async function runDiscovery(){
+async function runApiScan(){
+  const base=document.getElementById('apiBase').value.trim().replace(/\/$/,'');
+  const addr=document.getElementById('scanAddr').value.trim();
+  if(!addr){toast('Enter an address','err');return;}
+
+  const btn=document.getElementById('scanBtn');btn.disabled=true;
+  const prog=document.getElementById('scanProgress');prog.style.display='inline';
+  const bar=document.getElementById('scanBar');bar.style.display='block';
+  const fill=document.getElementById('scanFill');fill.style.width='0%';
+
+  // Build endpoint list
+  const endpoints=[];
+  const paths=[
+    // Airdrop-related
+    `/airdropChallenge?address=${addr}`,
+    `/airdropClaim?address=${addr}`,
+    `/airdropDetail?address=${addr}`,
+    `/airdropProof?address=${addr}`,
+    `/airdropVerify?address=${addr}`,
+    `/airdrop?address=${addr}`,
+    `/claim?address=${addr}`,
+    `/challenge?address=${addr}`,
+    `/proof?address=${addr}`,
+    `/verify?address=${addr}`,
+    `/status?address=${addr}`,
+    `/allocation?address=${addr}`,
+    `/balance?address=${addr}`,
+    `/eligibility?address=${addr}`,
+    `/eligible?address=${addr}`,
+    `/reward?address=${addr}`,
+    `/rewards?address=${addr}`,
+    `/vesting?address=${addr}`,
+    `/unlock?address=${addr}`,
+    `/release?address=${addr}`,
+    `/signature?address=${addr}`,
+    `/sign?address=${addr}`,
+    `/token?address=${addr}`,
+    `/info?address=${addr}`,
+    `/user?address=${addr}`,
+    `/account?address=${addr}`,
+    // No address
+    `/status`,
+    `/health`,
+    `/ping`,
+    `/info`,
+    `/version`,
+    `/config`,
+    `/`,
+    // Discovery/docs
+    `/docs`,
+    `/swagger`,
+    `/swagger.json`,
+    `/openapi`,
+    `/openapi.json`,
+    `/api-docs`,
+    `/spec`,
+    `/redoc`,
+    `/schema`,
+    `/.well-known/openapi.json`,
+    `/robots.txt`,
+    `/sitemap.xml`,
+    // Alternative base paths
+    // v2
+    // These need full URL so we handle separately
+  ];
+
+  // Also try alternative base URLs
+  const bases=[base];
+  const baseNoV=base.replace(/\/v\d+\/?$/,'');
+  if(baseNoV!==base)bases.push(baseNoV);
+  const baseV2=base.replace(/\/v1\/?$/,'/v2');
+  if(baseV2!==base)bases.push(baseV2);
+
+  // Build full URLs with method
+  for(const b of bases){
+    for(const p of paths){
+      endpoints.push({method:'GET',url:`${b}${p}`,base:b});
+    }
+  }
+
+  // Add POST options for key endpoints
+  const postPaths=['/airdropClaim','/airdropChallenge','/airdropProof','/airdropVerify','/claim','/verify','/proof','/sign'];
+  for(const b of bases){
+    for(const p of postPaths){
+      endpoints.push({method:'OPTIONS',url:`${b}${p}`,base:b});
+    }
+  }
+
+  const proxies=getSelectedProxies();
+  const total=endpoints.length*proxies.length;
+  let done=0;
+  let results=[];
+
+  for(const proxy of proxies){
+    for(const ep of endpoints){
+      try{
+        const fetchUrl=proxy.fn(ep.url);
+        const controller=new AbortController();
+        const timeout=setTimeout(()=>controller.abort(),8000);
+
+        let r;
+        if(ep.method==='OPTIONS'){
+          r=await fetch(fetchUrl,{method:'OPTIONS',signal:controller.signal});
+        }else{
+          r=await fetch(fetchUrl,{signal:controller.signal});
+        }
+        clearTimeout(timeout);
+
+        const ct=r.headers.get('content-type')||'';
+        let body='';
+        try{
+          if(ct.includes('json')){body=JSON.stringify(await r.json(),null,2);}
+          else{body=(await r.text()).slice(0,500);}
+        }catch(e){body='(could not read body)';}
+
+        const cors=r.headers.get('access-control-allow-origin')||'none';
+        const ama=r.headers.get('access-control-allow-methods')||'';
+        const ah=r.headers.get('access-control-allow-headers')||'';
+
+        results.push({
+          proxy:proxy.name,
+          method:ep.method,
+          url:ep.url,
+          base:ep.base,
+          status:r.status,
+          ok:r.ok,
+          cors,
+          allowMethods:ama,
+          allowHeaders:ah,
+          body:body.slice(0,600),
+          contentType:ct
+        });
+      }catch(e){
+        results.push({
+          proxy:proxy.name,
+          method:ep.method,
+          url:ep.url,
+          base:ep.base,
+          status:'ERR',
+          ok:false,
+          cors:'—',
+          allowMethods:'',
+          allowHeaders:'',
+          body:e.name==='AbortError'?'Timeout':e.message.slice(0,100),
+          contentType:''
+        });
+      }
+
+      done++;
+      fill.style.width=`${Math.round(done/total*100)}%`;
+    }
+  }
+
+  // Render results
+  const el=document.getElementById('scanResults');el.style.display='block';
+
+  // Group by: working endpoints, CORS-enabled, failed
+  const working=results.filter(r=>r.ok);
+  const corsEnabled=results.filter(r=>r.cors!=='none');
+  const withBody=results.filter(r=>r.ok&&r.body&&r.body!=='(could not read body)'&&r.body.length>5);
+
+  let html='';
+
+  // Summary
+  html+=`<div class="dc dc-i"><div style="display:flex;gap:10px;align-items:flex-start;"><div class="di"><i class="fa-solid fa-chart-bar"></i></div><div>
+    <div style="font-weight:700;color:var(--accent2);margin-bottom:6px;">Scan Summary</div>
+    <div style="font-size:13px;">
+      <div>Total requests: <strong>${results.length}</strong></div>
+      <div>Working (2xx): <strong style="color:var(--accent);">${working.length}</strong></div>
+      <div>CORS-enabled: <strong style="color:${corsEnabled.length>0?'var(--accent)':'var(--danger)'};">${corsEnabled.length}</strong></div>
+      <div>With response body: <strong style="color:var(--accent2);">${withBody.length}</strong></div>
+    </div>
+  </div></div></div>`;
+
+  // Show working endpoints with body (most interesting)
+  if(withBody.length>0){
+    html+=`<div style="font-weight:700;font-size:15px;margin:12px 0 8px;color:var(--accent);"><i class="fa-solid fa-check-circle" style="margin-right:4px;"></i>Working Endpoints with Response</div>`;
+    for(const r of withBody){
+      const isJson=r.contentType.includes('json');
+      const bodyPreview=r.body.slice(0,400);
+      html+=`<div class="dc dc-ok">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <div>
+            <span class="tag tag-ok">${r.method}</span>
+            <span class="tag tag-info">${r.proxy}</span>
+            <span class="tag ${r.cors!=='none'?'tag-ok':'tag-err'}">${r.cors!=='none'?'CORS':'NO CORS'}</span>
+            <span style="font-weight:700;font-size:13px;margin-left:6px;">${r.url.replace(r.base,'')}</span>
+          </div>
+          <span style="font-weight:700;color:var(--accent);">${r.status}</span>
+        </div>
+        <div class="cb" style="font-size:10px;max-height:150px;">${bodyPreview}</div>
+      </div>`;
+    }
+  }
+
+  // Show CORS-enabled endpoints
+  if(corsEnabled.length>0){
+    html+=`<div style="font-weight:700;font-size:15px;margin:12px 0 8px;color:var(--accent);"><i class="fa-solid fa-unlock" style="margin-right:4px;"></i>CORS-Enabled Endpoints</div>`;
+    for(const r of corsEnabled){
+      html+=`<div class="dc dc-ok">
+        <span class="tag tag-ok">${r.method}</span>
+        <span class="tag tag-info">${r.proxy}</span>
+        <span style="font-weight:600;font-size:13px;margin-left:6px;" class="alink" onclick="cp('${r.url}')">${r.url.replace(r.base,'')}</span>
+        <span style="margin-left:8px;font-size:11px;color:var(--muted);">Allow-Methods: ${r.allowMethods}</span>
+      </div>`;
+    }
+  }
+
+  // Full table (collapsible)
+  html+=`<details style="margin-top:12px;"><summary style="cursor:pointer;font-weight:700;font-size:14px;color:var(--muted);">Show All ${results.length} Results</summary>
+  <div style="overflow-x:auto;margin-top:8px;"><table class="tbl">
+  <tr><th>Proxy</th><th>Method</th><th>Endpoint</th><th>Status</th><th>CORS</th><th>Body</th></tr>`;
+  for(const r of results){
+    const sc=r.ok?'var(--accent)':r.status==='ERR'?'var(--danger)':'var(--warning)';
+    const cc=r.cors!=='none'?'var(--accent)':'var(--danger)';
+    html+=`<tr>
+      <td style="font-size:10px;color:var(--muted);">${r.proxy}</td>
+      <td style="font-weight:600;color:var(--accent2);font-size:11px;">${r.method}</td>
+      <td style="font-size:10px;max-width:200px;" class="alink" onclick="cp('${r.url}')">${r.url.replace(r.base,'')}</td>
+      <td style="color:${sc};font-weight:600;">${r.status}</td>
+      <td style="color:${cc};font-size:10px;">${r.cors!=='none'?'YES':'NO'}</td>
+      <td style="font-size:10px;max-width:200px;"><details><summary style="cursor:pointer;color:var(--muted);">Show</summary><div style="font-size:9px;color:var(--muted);margin-top:4px;word-break:break-all;">${(r.body||'').slice(0,300)}</div></details></td>
+    </tr>`;
+  }
+  html+=`</table></div></details>`;
+
+  el.innerHTML=html;
+
+  btn.disabled=false;prog.style.display='none';bar.style.display='none';
+  fill.style.width='0%';
+  toast(`Scan complete: ${working.length} working, ${corsEnabled.length} CORS-enabled`,'ok');
+}
+
+// =====================================================================
+// BSCSCAN CONTRACT DISCOVERY
+// =====================================================================
+async function scanBscScan(){
+  const addr=document.getElementById('creatorAddr').value.trim();
+  const key=document.getElementById('bscKey').value.trim();
+  if(!ethers.isAddress(addr)){toast('Invalid address','err');return;}
+
+  const el=document.getElementById('bscResults');el.style.display='block';
+  el.innerHTML='<div class="dc dc-i"><div class="di" style="display:inline;"><i class="fa-solid fa-spinner fa-spin"></i></div> <span style="color:var(--accent2);">Querying BscScan API...</span></div>';
+
+  // Try BscScan API if key provided
+  if(key){
+    try{
+      const url=`https://api.bscscan.com/api?module=account&action=txlist&address=${addr}&startblock=0&endblock=99999999&sort=asc&apikey=${key}`;
+      const r=await fetch(url);
+      const data=await r.json();
+
+      if(data.status==='1'&&data.result){
+        const txs=data.result;
+        // Find contract creation transactions
+        const creations=txs.filter(tx=>tx.contractAddress&&tx.contractAddress!=='');
+        // Also find all outgoing txs to unique addresses
+        const outgoing=txs.filter(tx=>tx.from.toLowerCase()===addr.toLowerCase());
+        const uniqueTo=[...new Set(outgoing.map(tx=>tx.to).filter(t=>t&&t!==''))];
+
+        let html='';
+
+        html+=`<div class="dc dc-ok"><div style="display:flex;gap:10px;align-items:flex-start;"><div class="di"><i class="fa-solid fa-check-circle"></i></div><div>
+          <div style="font-weight:700;color:var(--accent);">BscScan Results</div>
+          <div style="font-size:13px;margin-top:4px;">Total transactions: ${txs.length} · Contract creations: <strong style="color:var(--accent);">${creations.length}</strong> · Unique outgoing: ${uniqueTo.length}</div>
+        </div></div></div>`;
+
+        if(creations.length>0){
+          html+=`<div style="font-weight:700;font-size:15px;margin:12px 0 8px;color:var(--accent);">Created Contracts</div>`;
+          html+=`<div style="overflow-x:auto;"><table class="tbl"><tr><th>Contract Address</th><th>TX Hash</th><th>Block</th><th>Time</th><th>Action</th></tr>`;
+          for(const c of creations){
+            const time=new Date(Number(c.timeStamp)*1000).toLocaleString();
+            html+=`<tr>
+              <td class="alink" onclick="cp('${c.contractAddress}')">${c.contractAddress}</td>
+              <td style="font-size:10px;">${s(c.hash)}</td>
+              <td style="font-size:11px;">${c.blockNumber}</td>
+              <td style="font-size:11px;">${time}</td>
+              <td><button class="btn-s" onclick="document.getElementById('verifyAddr').value='${c.contractAddress}';verifyAirdrop();" style="padding:4px 10px;font-size:10px;">Verify as Airdrop</button></td>
+            </tr>`;
+          }
+          html+=`</table></div>`;
+        }
+
+        el.innerHTML=html;
+        toast(`Found ${creations.length} contracts on BscScan`,'ok');
+        return;
+      }else{
+        el.innerHTML=`<div class="dc dc-w"><div style="font-weight:700;color:var(--warning);">BscScan API returned no results or error</div><div style="font-size:12px;color:var(--muted);">${data.message||data.result||'Unknown error'}</div></div>`;
+      }
+    }catch(e){
+      el.innerHTML=`<div class="dc dc-e"><div style="font-weight:700;color:var(--danger);">BscScan API Error</div><div style="font-size:12px;">${e.message}</div></div>`;
+    }
+  }
+
+  // Fallback: manual instructions
+  el.innerHTML+=`
+    <div class="dc dc-w" style="margin-top:10px;">
+      <div style="font-weight:700;color:var(--warning);margin-bottom:6px;">Manual Method (no API key needed)</div>
+      <div style="font-size:13px;color:var(--fg);line-height:1.6;">
+        <div style="margin-bottom:8px;">Go to BscScan and check the creator's transactions:</div>
+        <ol style="padding-left:20px;">
+          <li>Open <a href="https://bscscan.com/address/0x3cd986F0756cf2c1a401487222c177FF963f27a0" target="_blank" style="color:var(--accent);">this link</a></li>
+          <li>Click the <strong>"Transactions"</strong> tab</li>
+          <li>Look for transactions where the <strong>"To"</strong> column shows <strong>"Contract Creation"</strong></li>
+          <li>Each one is a deployed contract — click the contract address to inspect it</li>
+          <li>Use the <strong>"Read Contract"</strong> tab on each to verify:
+            <ul style="margin-top:4px;padding-left:16px;">
+              <li><code style="color:var(--accent);">getToken()</code> should return <code style="color:var(--accent);">0x33f6BE84becfF45ea6aA2952d7eF890B44bFB59d</code></li>
+              <li><code style="color:var(--accent);">onVestingMain()</code> should return the VestingMain address</li>
+              <li>Has a <code style="color:var(--accent);">claim()</code> function</li>
+            </ul>
+          </li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="dc dc-i" style="margin-top:10px;">
+      <div style="font-weight:700;color:var(--accent2);margin-bottom:6px;">Or: Get a Free BscScan API Key</div>
+      <div style="font-size:13px;color:var(--fg);line-height:1.6;">
+        <ol style="padding-left:20px;">
+          <li>Go to <a href="https://bscscan.com/register" target="_blank" style="color:var(--accent);">bscscan.com/register</a></li>
+          <li>Create a free account</li>
+          <li>Go to API-KEYs section and create a free key</li>
+          <li>Paste it above and click "Find Contracts"</li>
+        </ol>
+      </div>
+    </div>`;
+}
+
+// =====================================================================
+// CONTRACT VERIFIER
+// =====================================================================
+async function verifyAirdrop(){
   if(!ethersLoaded||!account){toast('Connect wallet first','err');return;}
-  const btn=document.getElementById('discBtn');btn.disabled=true;btn.innerHTML='<span class="spin" style="margin-right:6px;"></span>Discovering...';
-  const vis=document.getElementById('chainVis');vis.style.display='block';
-  const nodes=document.getElementById('chainNodes');
-  const res=document.getElementById('discResults');res.style.display='block';
+  const addr=document.getElementById('verifyAddr').value.trim();
+  if(!ethers.isAddress(addr)){toast('Invalid address','err');return;}
+
+  const btn=document.getElementById('verifyBtn');btn.disabled=true;btn.innerHTML='<span class="spin" style="margin-right:6px;"></span>Verifying...';
+  const el=document.getElementById('verifyResults');el.style.display='block';
   let html='';
 
   try{
-    // === LEVEL 1: TOKEN ===
-    nodes.innerHTML=chainNode('ONToken',TOKEN_ADDR,'searching','Reading contract...');
-    res.innerHTML=makeCard('i','fa-spinner fa-spin','Reading Token contract...','');
+    const c=new ethers.Contract(addr,AIRDROP_ABI,provider);
 
-    const[name,symbol,decimals,totalSupply,balance,tOwner]=await Promise.all([
-      tokenC.name(),tokenC.symbol(),tokenC.decimals(),tokenC.totalSupply(),
-      tokenC.balanceOf(account),tokenC.owner()
+    html+='<div class="dc dc-i"><div class="di"><i class="fa-solid fa-spinner fa-spin"></i></div> Reading contract functions...</div>';
+    el.innerHTML=html;
+
+    const[adToken,adVm,adOwner,adDetail]=await Promise.all([
+      c.getToken().catch(e=>({error:e.reason||e.message})),
+      c.onVestingMain().catch(e=>({error:e.reason||e.message})),
+      c.owner().catch(e=>({error:e.reason||e.message})),
+      c.getAirdropDetail(account).catch(e=>({error:e.reason||e.message}))
     ]);
-    dec=Number(decimals);sym=symbol;
-    disc.token={addr:TOKEN_ADDR,owner:tOwner,name,symbol,decimals:dec,totalSupply:ethers.formatUnits(totalSupply,dec),balance:ethers.formatUnits(balance,dec)};
 
-    nodes.innerHTML=chainNode('ONToken',TOKEN_ADDR,'found',
-      `${name} (${symbol}) · Supply: ${fN(disc.token.totalSupply)} ${symbol} · Your Balance: ${fN(disc.token.balance)} ${symbol}`);
+    // Read token owner for comparison
+    const tokenC=new ethers.Contract(TOKEN_ADDR,TOKEN_ABI,provider);
+    const tOwner=await tokenC.owner();
 
-    html+=makeCard('ok','fa-coins',`Token: ${name} (${symbol})`,
-      `Supply: ${fN(disc.token.totalSupply)} ${symbol} · Your Balance: ${fN(disc.token.balance)} ${symbol}`,
-      `Owner: <span class="alink" onclick="cp('${tOwner}')">${tOwner}</span> (this is likely the VestingMain contract)`);
+    // Check each function
+    const checks=[];
 
-    // === LEVEL 2: VESTING MAIN (token.owner()) ===
-    const vmAddr=tOwner;
-    nodes.innerHTML+=chainNode('ONVestingMain',vmAddr,'searching','Reading vesting main...');
-
-    let vmC;
-    try{
-      vmC=new ethers.Contract(vmAddr,VESTING_MAIN_ABI,provider);
-      const[isTGE,tgeTime,vmToken,vmImpl,vmTotal,vmOwner]=await Promise.all([
-        vmC.isTGE().catch(()=>null),vmC.getTimeTGE().catch(()=>null),
-        vmC.getTokenAddress().catch(()=>null),vmC.getImplementation().catch(()=>null),
-        vmC.getVestingContractTotal().catch(()=>null),vmC.owner().catch(()=>null)
-      ]);
-      disc.vestingMain={addr:vmAddr,isTGE:isTGE===true,tgeTime,tgeTime,tokenAddr:vmToken,impl:vmImpl,totalSubs:vmTotal?Number(vmTotal):0,owner:vmOwner};
-
-      const tgeStatus=isTGE===true?'<span style="color:var(--accent);font-weight:700;">STARTED</span>':'<span style="color:var(--danger);font-weight:700;">NOT STARTED</span>';
-      const tgeDate=tgeTime&&Number(tgeTime)>0?new Date(Number(tgeTime)*1000).toLocaleString():'—';
-
-      nodes.innerHTML+=chainNode('ONVestingMain',vmAddr,'found',
-        `TGE: ${isTGE?'STARTED':'NOT STARTED'} · TGE Time: ${tgeDate} · Total Vesting Contracts: ${disc.vestingMain.totalSubs}`);
-
-      html+=makeCard(isTGE?'ok':'e',isTGE?'fa-check-circle':'fa-clock',
-        `VestingMain — TGE: ${isTGE?'STARTED':'NOT STARTED'}`,
-        `isTGE: ${tgeStatus} · TGE Time: ${tgeDate} · Owner: ${s(vmOwner||'?')} · Token: ${s(vmToken||'?')}`,
-        `Implementation: ${s(vmImpl||'?')} · Total Sub-contracts: ${disc.vestingMain.totalSubs}`);
-
-    }catch(e){
-      nodes.innerHTML+=chainNode('ONVestingMain',vmAddr,'missing','Could not read as VestingMain: '+(e.reason||e.message||'').slice(0,100));
-      html+=makeCard('e','fa-times-circle','VestingMain Read Failed',
-        `Address ${s(vmAddr)} doesn't match VestingMain ABI. It may be an EOA or different contract type.`,
-        `Error: ${(e.reason||e.message||'').slice(0,200)}`);
-    }
-
-    // === LEVEL 3: AIRDROP CONTRACT ===
-    const airdropInput=document.getElementById('airdropInput').value.trim();
-    let adAddr=airdropInput&&ethers.isAddress(airdropInput)?airdropInput:null;
-
-    // Try to find airdrop from vestingMain's known patterns or from vesting subs
-    if(!adAddr&&vmC){
-      nodes.innerHTML+=chainNode('ONAirdrop','?','searching','Looking for airdrop contract...');
-      // The airdrop contract's onVestingMain points to vmAddr
-      // We can't enumerate all contracts, but we can check known addresses
-      // Try reading from common patterns or let user input
-      nodes.innerHTML+=chainNode('ONAirdrop','?','missing',
-        'Cannot auto-discover. Enter the airdrop address manually above.');
-      html+=makeCard('w','fa-question-circle','Airdrop Contract: Unknown',
-        'The airdrop contract address cannot be discovered from on-chain data alone. Enter it in the field above.',
-        'Hint: Check Etherscan for the contract that calls your token\'s transfer() with "claim" method.');
-    }
-
-    if(adAddr){
-      nodes.innerHTML+=chainNode('ONAirdrop',adAddr,'searching','Reading airdrop contract...');
-      try{
-        const adC=new ethers.Contract(adAddr,AIRDROP_ABI,provider);
-        const[adToken,adVm,adOwner,adDetail]=await Promise.all([
-          adC.getToken().catch(()=>null),adC.onVestingMain().catch(()=>null),
-          adC.owner().catch(()=>null),adC.getAirdropDetail(account).catch(()=>null)
-        ]);
-        disc.airdrop={addr:adAddr,tokenAddr:adToken,vestingMainAddr:adVm,owner:adOwner,detail:adDetail};
-
-        let adInfo=`Token: ${s(adToken||'?')} · VestingMain: ${s(adVm||'?')} · Owner: ${s(adOwner||'?')}`;
-        if(adDetail)adInfo+=` · Your Nonce: ${adDetail.nonce.toString()} · Redeemed: ${fN(ethers.formatUnits(adDetail.redeemed,dec))} ${sym}`;
-
-        // Verify the airdrop points to our vesting main
-        const vmMatch=adVm&&adVm.toLowerCase()===vmAddr.toLowerCase();
-
-        nodes.innerHTML+=chainNode('ONAirdrop',adAddr,'found',adInfo);
-        html+=makeCard(vmMatch?'ok':'w','fa-parachute-box','Airdrop Contract',adInfo,
-          vmMatch?'VestingMain matches!':'WARNING: onVestingMain() doesn\'t match the token owner!');
-      }catch(e){
-        nodes.innerHTML+=chainNode('ONAirdrop',adAddr,'missing','Read failed: '+(e.reason||e.message||'').slice(0,80));
-        html+=makeCard('e','fa-times-circle','Airdrop Read Failed',(e.reason||e.message||'').slice(0,300),'');
-      }
-    }
-
-    // === LEVEL 4: VESTING SUB-CONTRACTS ===
-    if(vmC&&disc.vestingMain.totalSubs>0){
-      const total=disc.vestingMain.totalSubs;
-      nodes.innerHTML+=chainNode(`VestingSubs (${total})`,'','searching',`Scanning ${total} sub-contracts for your address...`);
-      html+=makeCard('i','fa-spinner fa-spin',`Scanning ${total} Vesting Sub-contracts`,'Looking for your address...','');
-
-      res.innerHTML=html;
-
-      // Read all sub addresses in batches
-      const BATCH=25;
-      let subAddrs=[];
-      for(let i=0;i<total;i+=BATCH){
-        const batch=[];
-        for(let j=i;j<Math.min(i+BATCH,total);j++){
-          batch.push(vmC.getVestingContractAddress(j).catch(()=>null));
-        }
-        const results=await Promise.all(batch);
-        subAddrs.push(...results.filter(a=>a&&ethers.isAddress(a)));
-      }
-      disc.vestingSubs=subAddrs;
-
-      // Find your vesting contracts
-      disc.myVestingSubs=[];
-      for(let i=0;i<subAddrs.length;i++){
-        try{
-          const subC=new ethers.Contract(subAddrs[i],VESTING_SUB_ABI,provider);
-          const beneficiary=await subC.getBeneficiary().catch(()=>null);
-          if(beneficiary&&beneficiary.toLowerCase()===account.toLowerCase()){
-            const detail=await subC.getVestingDetail().catch(()=>null);
-            disc.myVestingSubs.push({address:subAddrs[i],beneficiary,detail});
-          }
-        }catch(e){}
-        // Update progress
-        if(i%10===0){
-          nodes.lastElementChild.querySelector('div:last-child div:last-child').textContent=`Scanned ${i+1}/${subAddrs.length}...`;
-        }
-      }
-
-      // Also try getVestingDetailList
-      if(disc.myVestingSubs.length===0){
-        try{
-          const list=await vmC.getVestingDetailList(0,Math.min(total,200));
-          const myEntries=list.filter(e=>e.beneficiary&&e.beneficiary.toLowerCase()===account.toLowerCase());
-          if(myEntries.length>0){
-            for(const e of myEntries){
-              disc.myVestingSubs.push({address:e.contractAddress,beneficiary:e.beneficiary,detail:e});
-            }
-          }
-        }catch(e){}
-      }
-
-      nodes.innerHTML+=chainNode(`VestingSubs (${total})`,'','found',
-        `Found ${subAddrs.length} sub-contracts · ${disc.myVestingSubs.length} belong to you`);
-
-      // Remove the "scanning" card and replace with results
-      html=html.replace(/<div class="dc dc-i".*?Scanning.*?<\/div><\/div><\/div>/,'');
-
-      if(disc.myVestingSubs.length>0){
-        html+=makeCard('ok','fa-user-check',`Found ${disc.myVestingSubs.length} Vesting Schedule(s) For You`,'See details below','');
-        document.getElementById('vestSection').style.display='block';
-
-        let vHtml='';
-        for(const vs of disc.myVestingSubs){
-          const d=vs.detail;
-          if(!d)continue;
-          const claimable=d.balanceClaimable?ethers.formatUnits(d.balanceClaimable,dec):'0';
-          const remain=d.balanceRemain?ethers.formatUnits(d.balanceRemain,dec):'0';
-          const totalC=d.totalClaimed?ethers.formatUnits(d.totalClaimed,dec):'0';
-          const start=d.start&&Number(d.start)>0?new Date(Number(d.start)*1000).toLocaleString():'—';
-          const end=d.end&&Number(d.end)>0?new Date(Number(d.end)*1000).toLocaleString():'—';
-          const unlocked=d.unlockedAtTGE?ethers.formatUnits(d.unlockedAtTGE,dec):'0';
-          const msAmt=d.milestoneReleaseAmount?ethers.formatUnits(d.milestoneReleaseAmount,dec):'0';
-          const msDur=d.milestoneDuration?Number(d.milestoneDuration)/86400:'?';
-          const msClaimed=d.milestoneClaimed?d.milestoneClaimed.toString():'0';
-          const canClaim=Number(claimable)>0;
-
-          vHtml+=`<div class="dc dc-ok" style="margin-bottom:14px;">
-            <div style="font-weight:700;font-size:14px;color:var(--accent);margin-bottom:10px;">
-              <i class="fa-solid fa-lock-open" style="margin-right:4px;"></i> Vesting: <span class="alink" onclick="cp('${vs.address}')">${s(vs.address)}</span>
-            </div>
-            <table class="tbl">
-              <tr><th>Field</th><th>Value</th></tr>
-              <tr><td style="color:var(--muted);">Start</td><td>${start}</td></tr>
-              <tr><td style="color:var(--muted);">End</td><td>${end}</td></tr>
-              <tr><td style="color:var(--muted);">Unlocked at TGE</td><td style="color:var(--accent);font-weight:600;">${fN(unlocked)} ${sym}</td></tr>
-              <tr><td style="color:var(--muted);">Milestone Duration</td><td>${msDur} days</td></tr>
-              <tr><td style="color:var(--muted);">Per Milestone</td><td>${fN(msAmt)} ${sym}</td></tr>
-              <tr><td style="color:var(--muted);">Milestones Claimed</td><td>${msClaimed}</td></tr>
-              <tr><td style="color:var(--warning);font-weight:700;">Claimable Now</td><td style="color:var(--accent);font-weight:700;font-size:16px;">${fN(claimable)} ${sym}</td></tr>
-              <tr><td style="color:var(--muted);">Remaining</td><td>${fN(remain)} ${sym}</td></tr>
-              <tr><td style="color:var(--muted);">Total Claimed</td><td>${fN(totalC)} ${sym}</td></tr>
-            </table>
-            ${canClaim?`<button class="btn-big" onclick="claimVesting('${vs.address}')" style="margin-top:12px;padding:12px 28px;font-size:14px;"><i class="fa-solid fa-unlock" style="margin-right:6px;"></i>Claim ${fN(claimable)} ${sym}</button>`:'<div style="margin-top:10px;padding:8px 12px;border-radius:8px;background:var(--bg2);font-size:12px;color:var(--muted);"><i class="fa-solid fa-hourglass" style="margin-right:4px;"></i>No claimable amount yet. Wait for the next milestone.</div>'}
-          </div>`;
-        }
-        document.getElementById('vestResults').innerHTML=vHtml;
-      }else{
-        html+=makeCard('w','fa-user-xmark','No Vesting Schedules Found For Your Address',
-          `Your address ${s(account)} was not found in any of the ${subAddrs.length} vesting sub-contracts. Your tokens may be in the direct airdrop path instead.`,'');
-      }
-    }
-
-    // === NETWORK INFO ===
-    const net=await provider.getNetwork();
-    const bn=await provider.getBlockNumber();
-    const block=await provider.getBlock(bn);
-    disc.network=net;disc.blockNum=bn;disc.blockTime=Number(block.timestamp);
-
-    html+=makeCard('i','fa-network-wired','Network',
-      `${nN(Number(net.chainId))} (Chain ID: ${net.chainId}) · Block #${bn}`,
-      `Block time: ${new Date(disc.blockTime*1000).toLocaleString()} · Your address: ${s(account)}`);
-
-    // === SUMMARY ===
-    const problems=[];
-    if(!disc.vestingMain.isTGE)problems.push('<strong>TGE not started</strong> — airdrop claims will revert with TGENotStarted(). Vesting claims may also be blocked.');
-    if(disc.myVestingSubs.length===0)problems.push('No vesting schedules found for your address in the VestingMain contract.');
-    if(!disc.airdrop.addr)problems.push('Airdrop contract address not provided — enter it above to check your airdrop status.');
-
-    if(problems.length>0){
-      html+=makeCard('e','fa-triangle-exclamation','Issues Found',
-        problems.map((p,i)=>`<div style="margin-bottom:4px;">${i+1}. ${p}</div>`).join(''),
-        'These may prevent you from claiming.');
+    // 1. getToken()
+    if(adToken&&!adToken.error){
+      const match=adToken.toLowerCase()===TOKEN_ADDR.toLowerCase();
+      checks.push({ok:match,icon:match?'fa-check-circle':'fa-times-circle',label:'getToken()',detail:adToken,note:match?'Matches ONToken!':'Does NOT match ONToken'});
     }else{
-      html+=makeCard('ok','fa-check-circle','All Systems Go','You have claimable tokens or a valid airdrop status.','Use the claim buttons above.');
+      checks.push({ok:false,icon:'fa-question-circle',label:'getToken()',detail:'Function not found or error',note:'This contract may not be ONAirdrop'});
     }
 
-    res.innerHTML=html;
+    // 2. onVestingMain()
+    if(adVm&&!adVm.error){
+      const match=adVm.toLowerCase()===tOwner.toLowerCase();
+      checks.push({ok:match,icon:match?'fa-check-circle':'fa-times-circle',label:'onVestingMain()',detail:adVm,note:match?'Matches Token Owner (VestingMain)':'Does NOT match Token Owner'});
+    }else{
+      checks.push({ok:false,icon:'fa-question-circle',label:'onVestingMain()',detail:'Function not found or error',note:'Missing function — may not be ONAirdrop'});
+    }
+
+    // 3. owner()
+    if(adOwner&&!adOwner.error){
+      checks.push({ok:true,icon:'fa-info-circle',label:'owner()',detail:adOwner,note:'Contract owner address'});
+    }else{
+      checks.push({ok:false,icon:'fa-question-circle',label:'owner()',detail:'Not readable',note:''});
+    }
+
+    // 4. getAirdropDetail()
+    if(adDetail&&!adDetail.error){
+      checks.push({ok:true,icon:'fa-check-circle',label:'getAirdropDetail(you)',detail:`Nonce: ${adDetail.nonce.toString()} · Redeemed: ${fN(ethers.formatUnits(adDetail.redeemed,18))}`,note:'Function works — this is likely the airdrop contract!'});
+    }else{
+      checks.push({ok:false,icon:'fa-question-circle',label:'getAirdropDetail(you)',detail:'Error or not found',note:'May not be ONAirdrop or wrong network'});
+    }
+
+    // Overall verdict
+    const passCount=checks.filter(c=>c.ok).length;
+    const criticalPass=checks[0].ok&&checks[2]&&checks[2].ok; // getToken + getAirdropDetail
+    const allPass=checks.every(c=>c.ok);
+
+    html='';
+
+    if(criticalPass){
+      html+=`<div class="dc dc-ok"><div style="display:flex;gap:10px;align-items:flex-start;"><div class="di"><i class="fa-solid fa-check-double"></i></div><div>
+        <div style="font-weight:700;color:var(--accent);font-size:16px;">This IS the ONAirdrop Contract!</div>
+        <div style="font-size:13px;color:var(--fg);margin-top:4px;">Address: <span class="alink" onclick="cp('${addr}')">${addr}</span></div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">${passCount}/4 checks passed. You can use this address for claiming.</div>
+      </div></div></div>`;
+    }else if(passCount>=2){
+      html+=`<div class="dc dc-w"><div style="display:flex;gap:10px;align-items:flex-start;"><div class="di"><i class="fa-solid fa-exclamation-triangle"></i></div><div>
+        <div style="font-weight:700;color:var(--warning);">Possibly ONAirdrop — Needs Verification</div>
+        <div style="font-size:13px;color:var(--fg);margin-top:4px;">${passCount}/4 checks passed. Some functions matched but not all. May be a different version or wrong network.</div>
+      </div></div></div>`;
+    }else{
+      html+=`<div class="dc dc-e"><div style="display:flex;gap:10px;align-items:flex-start;"><div class="di"><i class="fa-solid fa-times-circle"></i></div><div>
+        <div style="font-weight:700;color:var(--danger);">Probably NOT the ONAirdrop Contract</div>
+        <div style="font-size:13px;color:var(--fg);margin-top:4px;">${passCount}/4 checks passed. This address doesn't match the expected ONAirdrop interface.</div>
+      </div></div></div>`;
+    }
+
+    // Individual checks
+    html+=`<div style="font-weight:700;font-size:14px;margin:12px 0 8px;">Verification Checks</div>`;
+    for(const ch of checks){
+      const c=ch.ok?'dc-ok':'dc-e';
+      const ic=ch.ok?'var(--accent)':'var(--danger)';
+      html+=`<div class="dc ${c}"><div style="display:flex;gap:10px;align-items:center;"><div class="di"><i class="fa-solid ${ch.icon}"></i></div><div>
+        <div style="font-weight:700;font-size:13px;color:${ic};">${ch.label}</div>
+        <div style="font-size:12px;color:var(--fg);">${ch.detail}</div>
+        ${ch.note?`<div style="font-size:11px;color:var(--muted);margin-top:2px;">${ch.note}</div>`:''}
+      </div></div></div>`;
+    }
+
+    // Token comparison table
+    html+=`<div style="font-weight:700;font-size:14px;margin:12px 0 8px;">Cross-Reference</div>`;
+    html+=`<table class="tbl"><tr><th>Check</th><th>This Contract</th><th>Expected</th><th>Match</th></tr>`;
+    html+=`<tr><td style="color:var(--muted);">getToken()</td><td>${checks[0].ok?s(adToken):'N/A'}</td><td>${s(TOKEN_ADDR)}</td><td style="color:${checks[0].ok?'var(--accent)':'var(--danger)'};">${checks[0].ok?'YES':'NO'}</td></tr>`;
+    html+=`<tr><td style="color:var(--muted);">onVestingMain()</td><td>${checks[1].ok?s(adVm):'N/A'}</td><td>${s(tOwner)}</td><td style="color:${checks[1].ok?'var(--accent)':'var(--danger)'};">${checks[1].ok?'YES':'NO'}</td></tr>`;
+    html+=`</table>`;
+
+    el.innerHTML=html;
 
   }catch(e){
     console.error(e);
-    res.innerHTML+=makeCard('e','fa-times-circle','Discovery Error',(e.reason||e.message||String(e)).slice(0,500),'');
+    el.innerHTML+=`<div class="dc dc-e"><div style="font-weight:700;color:var(--danger);">Verification Error</div><div style="font-size:12px;">${(e.reason||e.message||'').slice(0,300)}</div></div>`;
   }finally{
-    btn.disabled=false;btn.innerHTML='<i class="fa-solid fa-satellite-dish" style="margin-right:6px;"></i>Discover All Contracts';
+    btn.disabled=false;btn.innerHTML='<i class="fa-solid fa-check-double" style="margin-right:6px;"></i>Verify Contract';
   }
-}
-
-// =====================================================================
-// VESTING CLAIM (direct, no proof needed)
-// =====================================================================
-async function claimVesting(subAddr){
-  if(!signer){toast('Connect wallet','err');return;}
-  try{
-    const subC=new ethers.Contract(subAddr,VESTING_SUB_ABI,signer);
-    toast('Confirm claim in your wallet...','inf');
-    const tx=await subC.claim();
-    toast(`TX submitted: ${s(tx.hash)} — waiting for confirmation...`,'inf');
-    const r=await tx.wait();
-    toast('Vesting claim successful!','ok');
-    runDiscovery();
-  }catch(e){
-    let m=e.reason||e.message||String(e);
-    if(m.includes('execution reverted:'))m=m.split('execution reverted:').pop().trim();
-    toast('Claim failed: '+m,'err');
-  }
-}
-
-// =====================================================================
-// AIRDROP CLAIM (challenge-response)
-// =====================================================================
-async function apiGet(url){const r=await fetch(url);if(!r.ok){const t=await r.text();throw new Error(`${r.status}: ${t}`);}return await r.json();}
-async function apiPost(url,body){const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});if(!r.ok){const t=await r.text();throw new Error(`${r.status}: ${t}`);}return await r.json();}
-
-async function oneClickClaim(){
-  if(!account||!signer){toast('Connect wallet first','err');return;}
-  const adAddr=disc.airdrop.addr||document.getElementById('airdropInput').value.trim();
-  if(!adAddr||!ethers.isAddress(adAddr)){toast('Enter the airdrop contract address first','err');return;}
-
-  const adC=new ethers.Contract(adAddr,AIRDROP_ABI,signer);
-  const btn=document.getElementById('claimBtn');btn.disabled=true;
-  const st=document.getElementById('claimStatus');st.style.display='block';
-  spPT();
-
-  try{
-    // Step 2
-    setCS(2);st.innerHTML=sc('i','fa-spinner fa-spin','Step 2: Fetching challenge from API...','');
-    btn.innerHTML='<span class="spin" style="margin-right:6px;"></span>Fetching...';
-    const chData=await apiGet(`${API_BASE}/airdropChallenge?address=${account}`);
-    const challenge=chData.challenge||chData.message||chData.data;
-    if(!challenge)throw new Error('No challenge: '+JSON.stringify(chData).slice(0,200));
-    curChallenge=challenge;
-    lApi('Step 2: Challenge',chData);
-
-    // Step 3
-    setCS(3);st.innerHTML=sc('i','fa-spinner fa-spin','Step 3: Sign the challenge in your wallet...','Check wallet popup');
-    btn.innerHTML='<span class="spin" style="margin-right:6px;"></span>Sign in Wallet...';
-    curSig=await signer.signMessage(challenge);
-    lApi('Step 3: Signature',{signature:curSig});
-
-    // Step 4 — try many endpoints
-    setCS(4);st.innerHTML=sc('i','fa-spinner fa-spin','Step 4: Getting operator proof...','Trying API endpoints');
-    btn.innerHTML='<span class="spin" style="margin-right:6px;"></span>Getting Proof...';
-    let proofData=null;
-    const eps=[
-      {url:`${API_BASE}/airdropClaim`,body:{address:account,challenge,signature:curSig}},
-      {url:`${API_BASE}/airdropChallenge`,body:{address:account,challenge,signature:curSig}},
-      {url:`${API_BASE}/airdropProof`,body:{address:account,challenge,signature:curSig}},
-      {url:`${API_BASE}/airdropVerify`,body:{address:account,challenge,signature:curSig}},
-      {url:`${API_BASE}/airdropClaim`,body:{address:account,signature:curSig}},
-      {url:`${API_BASE}/airdropChallenge`,body:{address:account,signature:curSig}},
-      {url:`${API_BASE}/airdropClaim`,body:{address:account,message:challenge,signature:curSig}},
-      {url:`${API_BASE}/airdropChallenge`,body:{address:account,message:challenge,signature:curSig}},
-      {url:`${API_BASE}/airdropClaim`,body:{address:account,challenge,sig:curSig}},
-      {url:`${API_BASE}/airdropChallenge`,body:{address:account,challenge,sig:curSig}},
-    ];
-    for(const ep of eps){try{proofData=await apiPost(ep.url,ep.body);break;}catch(e){continue;}}
-    if(!proofData)throw new Error('All API endpoints failed. CORS may be blocking browser requests. Use tge.orochi.network directly.');
-    lApi('Step 4: Proof',proofData);
-
-    // Parse
-    const srch=proofData.data||proofData;
-    let eProof,amount,nonce,timestamp;
-    for(const[k,v] of Object.entries(srch)){
-      const kl=k.toLowerCase();
-      if((kl.includes('proof')||kl.includes('signature')||kl.includes('ecdsa'))&&typeof v==='string'&&v.startsWith('0x')&&v.length>=64&&!eProof)eProof=v;
-      if(kl.includes('amount')&&v)amount=v.toString();
-      if(kl.includes('nonce')&&v)nonce=v.toString();
-      if((kl.includes('timestamp')||kl.includes('time'))&&v)timestamp=v.toString();
-    }
-    if(typeof proofData==='string'&&proofData.startsWith('0x')&&proofData.length>=64)eProof=proofData;
-    if(!eProof)throw new Error('No ECDSA proof in response: '+JSON.stringify(proofData).slice(0,300));
-    curProof=eProof;curPayload={amount,nonce,timestamp};
-    if(timestamp)spTS(timestamp);
-
-    // Step 5
-    setCS(5);st.innerHTML=sc('i','fa-spinner fa-spin','Step 5: Submitting claim on-chain...','Confirm in wallet');
-    btn.innerHTML='<span class="spin" style="margin-right:6px;"></span>Confirm...';
-    const tx=await adC.claim(eProof,{amount,nonce,timestamp});
-    st.innerHTML=sc('i','fa-spinner fa-spin','Waiting for confirmation...',`TX: ${s(tx.hash)}`);
-    btn.innerHTML='<span class="spin" style="margin-right:6px;"></span>Confirming...';
-    await tx.wait();spPT();
-    st.innerHTML=sc('ok','fa-check-circle','Claim Successful!',`${amount?fN(ethers.formatUnits(amount,dec))+' '+sym:'Tokens'} claimed. TX: <span class="alink" onclick="cp('${tx.hash}')">${s(tx.hash)}</span>`);
-    toast('Claim successful!','ok');setCS(6);
-  }catch(e){
-    console.error(e);spPT();
-    let m=e.reason||e.message||String(e);
-    if(m.includes('execution reverted:'))m=m.split('execution reverted:').pop().trim();
-    if(m.includes('user rejected')||m.includes('denied'))m='You rejected the wallet signature.';
-    st.innerHTML=sc('e','fa-times-circle','Error',m);toast('Error: '+m,'err');
-  }finally{
-    btn.disabled=false;btn.innerHTML='<i class="fa-solid fa-parachute-box" style="margin-right:6px;"></i>One-Click Airdrop Claim';
-  }
-}
-
-function sc(type,icon,title,detail){
-  const c=type==='ok'?'dc-ok':type==='e'?'dc-e':'dc-i';
-  const ic=type==='ok'?'var(--accent)':type==='e'?'var(--danger)':'var(--accent2)';
-  return`<div class="dc ${c}"><div style="display:flex;gap:10px;align-items:center;"><div class="di"><i class="fa-solid ${icon}"></i></div><div><div style="font-weight:700;color:${ic};">${title}</div><div style="font-size:12px;color:var(--fg);">${detail}</div></div></div></div>`;
-}
-function lApi(t,d){const el=document.getElementById('apiLog');el.style.display='block';el.innerHTML+=`<div class="dc dc-i"><div style="font-weight:700;font-size:12px;color:var(--accent2);margin-bottom:4px;">${t}</div><div class="cb">${typeof d==='string'?d:JSON.stringify(d,null,2)}</div></div>`;}
-function spTS(ts){const pTs=Number(ts);if(pTimer)clearInterval(pTimer);const area=document.getElementById('timerArea');area.style.display='block';area.innerHTML=`<div class="dc dc-w"><div style="display:flex;gap:10px;align-items:center;"><div class="di"><i class="fa-solid fa-hourglass-half"></i></div><div><div style="font-weight:700;font-size:13px;color:var(--warning);">Proof Expires In</div><div class="mono" style="font-size:14px;font-weight:700;" id="tD">--:--</div></div></div></div>`;
-function u(){const n=Math.floor(Date.now()/1000),r=pTs+PROOF_EXPIRY-n;if(r<=0){document.getElementById('tD').textContent='EXPIRED';document.getElementById('tD').className='mono timer-d';clearInterval(pTimer);return;}const m=Math.floor(r/60),s=r%60;const d=document.getElementById('tD');d.textContent=`${m}:${s.toString().padStart(2,'0')}`;d.className='mono '+(r>60?'timer-ok':r>30?'timer-w':'timer-d');}u();pTimer=setInterval(u,1000);}
-function spPT(){if(pTimer)clearInterval(pTimer);document.getElementById('timerArea').style.display='none';}
-
-// =====================================================================
-// API EXPLORER
-// =====================================================================
-async function exploreApi(){
-  if(!account){toast('Connect wallet first','err');return;}
-  const el=document.getElementById('apiExploreResults');el.style.display='block';
-  el.innerHTML='<div class="dc dc-i"><div class="di" style="display:inline;"><i class="fa-solid fa-spinner fa-spin"></i></div> <span style="color:var(--accent2);">Testing endpoints...</span></div>';
-  let results=[];
-  const gets=[
-    `${API_BASE}/airdropChallenge?address=${account}`,
-    `${API_BASE}/airdropDetail?address=${account}`,
-    `${API_BASE}/airdrop?address=${account}`,
-    `${API_BASE}/claim?address=${account}`,
-    `${API_BASE}/status`,
-    `${API_BASE}/health`,
-  ];
-  for(const url of gets){try{const r=await fetch(url);const ct=r.headers.get('content-type');let b='';if(ct&&ct.includes('json')){b=JSON.stringify(await r.json(),null,2);}else{b=(await r.text()).slice(0,500);}results.push({url,method:'GET',status:r.status,ok:r.ok,body:b.slice(0,500),cors:r.headers.get('access-control-allow-origin')||'none'});}catch(e){results.push({url,method:'GET',status:'ERR',ok:false,body:e.message,cors:'—'});}}
-  const posts=[`${API_BASE}/airdropClaim`,`${API_BASE}/airdropChallenge`,`${API_BASE}/airdropProof`];
-  for(const url of posts){try{const r=await fetch(url,{method:'OPTIONS'});const am=r.headers.get('access-control-allow-methods')||'';const ah=r.headers.get('access-control-allow-headers')||'';const co=r.headers.get('access-control-allow-origin')||'none';results.push({url,method:'OPTIONS',status:r.status,ok:r.ok,body:`Allow-Methods: ${am}\nAllow-Headers: ${ah}`,cors:co});}catch(e){results.push({url,method:'OPTIONS',status:'ERR',ok:false,body:e.message,cors:'—'});}}
-  let h=`<table class="tbl"><tr><th>Method</th><th>Endpoint</th><th>Status</th><th>CORS</th><th>Body</th></tr>`;
-  for(const r of results){const sc2=r.ok?'var(--accent)':r.status==='ERR'?'var(--danger)':'var(--warning)';const cc=r.cors!=='none'?'var(--accent)':'var(--danger)';
-  h+=`<tr><td style="font-weight:600;color:var(--accent2);">${r.method}</td><td class="alink" style="font-size:10px;" onclick="cp('${r.url}')">${r.url.replace(API_BASE,'')}</td><td style="color:${sc2};font-weight:600;">${r.status}</td><td style="color:${cc};font-size:10px;">${r.cors!=='none'?'YES':'NO'}</td><td style="font-size:10px;max-width:280px;"><details><summary style="cursor:pointer;color:var(--muted);">Show</summary><div class="cb" style="margin-top:4px;font-size:9px;">${r.body}</div></details></td></tr>`;}
-  h+=`</table>`;
-  const corsN=results.filter(r=>r.cors!=='none').length;
-  h+=`<div class="dc dc-i" style="margin-top:10px;"><div style="font-size:12px;">CORS-enabled: <strong style="color:${corsN>0?'var(--accent)':'var(--danger)'};">${corsN}</strong> / ${results.length}${corsN===0?'<div style="color:var(--danger);margin-top:6px;">No CORS endpoints. Browser claiming blocked. Use tge.orochi.network.</div>':''}</div></div>`;
-  el.innerHTML=h;
 }
 
 // =====================================================================
